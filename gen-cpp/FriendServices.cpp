@@ -796,8 +796,8 @@ uint32_t FriendServices_acceptRequest_args::read(::apache::thrift::protocol::TPr
         break;
       case 2:
         if (ftype == ::apache::thrift::protocol::T_I32) {
-          xfer += iprot->readI32(this->friendId);
-          this->__isset.friendId = true;
+          xfer += iprot->readI32(this->requestId);
+          this->__isset.requestId = true;
         } else {
           xfer += iprot->skip(ftype);
         }
@@ -823,8 +823,8 @@ uint32_t FriendServices_acceptRequest_args::write(::apache::thrift::protocol::TP
   xfer += oprot->writeI32(this->curId);
   xfer += oprot->writeFieldEnd();
 
-  xfer += oprot->writeFieldBegin("friendId", ::apache::thrift::protocol::T_I32, 2);
-  xfer += oprot->writeI32(this->friendId);
+  xfer += oprot->writeFieldBegin("requestId", ::apache::thrift::protocol::T_I32, 2);
+  xfer += oprot->writeI32(this->requestId);
   xfer += oprot->writeFieldEnd();
 
   xfer += oprot->writeFieldStop();
@@ -846,8 +846,8 @@ uint32_t FriendServices_acceptRequest_pargs::write(::apache::thrift::protocol::T
   xfer += oprot->writeI32((*(this->curId)));
   xfer += oprot->writeFieldEnd();
 
-  xfer += oprot->writeFieldBegin("friendId", ::apache::thrift::protocol::T_I32, 2);
-  xfer += oprot->writeI32((*(this->friendId)));
+  xfer += oprot->writeFieldBegin("requestId", ::apache::thrift::protocol::T_I32, 2);
+  xfer += oprot->writeI32((*(this->requestId)));
   xfer += oprot->writeFieldEnd();
 
   xfer += oprot->writeFieldStop();
@@ -1003,8 +1003,8 @@ uint32_t FriendServices_declineRequest_args::read(::apache::thrift::protocol::TP
         break;
       case 2:
         if (ftype == ::apache::thrift::protocol::T_I32) {
-          xfer += iprot->readI32(this->friendId);
-          this->__isset.friendId = true;
+          xfer += iprot->readI32(this->requestId);
+          this->__isset.requestId = true;
         } else {
           xfer += iprot->skip(ftype);
         }
@@ -1030,8 +1030,8 @@ uint32_t FriendServices_declineRequest_args::write(::apache::thrift::protocol::T
   xfer += oprot->writeI32(this->curId);
   xfer += oprot->writeFieldEnd();
 
-  xfer += oprot->writeFieldBegin("friendId", ::apache::thrift::protocol::T_I32, 2);
-  xfer += oprot->writeI32(this->friendId);
+  xfer += oprot->writeFieldBegin("requestId", ::apache::thrift::protocol::T_I32, 2);
+  xfer += oprot->writeI32(this->requestId);
   xfer += oprot->writeFieldEnd();
 
   xfer += oprot->writeFieldStop();
@@ -1053,8 +1053,8 @@ uint32_t FriendServices_declineRequest_pargs::write(::apache::thrift::protocol::
   xfer += oprot->writeI32((*(this->curId)));
   xfer += oprot->writeFieldEnd();
 
-  xfer += oprot->writeFieldBegin("friendId", ::apache::thrift::protocol::T_I32, 2);
-  xfer += oprot->writeI32((*(this->friendId)));
+  xfer += oprot->writeFieldBegin("requestId", ::apache::thrift::protocol::T_I32, 2);
+  xfer += oprot->writeI32((*(this->requestId)));
   xfer += oprot->writeFieldEnd();
 
   xfer += oprot->writeFieldStop();
@@ -1832,20 +1832,20 @@ ErrorCode::type FriendServicesClient::recv_addFriend()
   throw ::apache::thrift::TApplicationException(::apache::thrift::TApplicationException::MISSING_RESULT, "addFriend failed: unknown result");
 }
 
-ErrorCode::type FriendServicesClient::acceptRequest(const int32_t curId, const int32_t friendId)
+ErrorCode::type FriendServicesClient::acceptRequest(const int32_t curId, const int32_t requestId)
 {
-  send_acceptRequest(curId, friendId);
+  send_acceptRequest(curId, requestId);
   return recv_acceptRequest();
 }
 
-void FriendServicesClient::send_acceptRequest(const int32_t curId, const int32_t friendId)
+void FriendServicesClient::send_acceptRequest(const int32_t curId, const int32_t requestId)
 {
   int32_t cseqid = 0;
   oprot_->writeMessageBegin("acceptRequest", ::apache::thrift::protocol::T_CALL, cseqid);
 
   FriendServices_acceptRequest_pargs args;
   args.curId = &curId;
-  args.friendId = &friendId;
+  args.requestId = &requestId;
   args.write(oprot_);
 
   oprot_->writeMessageEnd();
@@ -1891,20 +1891,20 @@ ErrorCode::type FriendServicesClient::recv_acceptRequest()
   throw ::apache::thrift::TApplicationException(::apache::thrift::TApplicationException::MISSING_RESULT, "acceptRequest failed: unknown result");
 }
 
-ErrorCode::type FriendServicesClient::declineRequest(const int32_t curId, const int32_t friendId)
+ErrorCode::type FriendServicesClient::declineRequest(const int32_t curId, const int32_t requestId)
 {
-  send_declineRequest(curId, friendId);
+  send_declineRequest(curId, requestId);
   return recv_declineRequest();
 }
 
-void FriendServicesClient::send_declineRequest(const int32_t curId, const int32_t friendId)
+void FriendServicesClient::send_declineRequest(const int32_t curId, const int32_t requestId)
 {
   int32_t cseqid = 0;
   oprot_->writeMessageBegin("declineRequest", ::apache::thrift::protocol::T_CALL, cseqid);
 
   FriendServices_declineRequest_pargs args;
   args.curId = &curId;
-  args.friendId = &friendId;
+  args.requestId = &requestId;
   args.write(oprot_);
 
   oprot_->writeMessageEnd();
@@ -2327,7 +2327,7 @@ void FriendServicesProcessor::process_acceptRequest(int32_t seqid, ::apache::thr
 
   FriendServices_acceptRequest_result result;
   try {
-    result.success = iface_->acceptRequest(args.curId, args.friendId);
+    result.success = iface_->acceptRequest(args.curId, args.requestId);
     result.__isset.success = true;
   } catch (const std::exception& e) {
     if (this->eventHandler_.get() != NULL) {
@@ -2381,7 +2381,7 @@ void FriendServicesProcessor::process_declineRequest(int32_t seqid, ::apache::th
 
   FriendServices_declineRequest_result result;
   try {
-    result.success = iface_->declineRequest(args.curId, args.friendId);
+    result.success = iface_->declineRequest(args.curId, args.requestId);
     result.__isset.success = true;
   } catch (const std::exception& e) {
     if (this->eventHandler_.get() != NULL) {
@@ -2863,13 +2863,13 @@ ErrorCode::type FriendServicesConcurrentClient::recv_addFriend(const int32_t seq
   } // end while(true)
 }
 
-ErrorCode::type FriendServicesConcurrentClient::acceptRequest(const int32_t curId, const int32_t friendId)
+ErrorCode::type FriendServicesConcurrentClient::acceptRequest(const int32_t curId, const int32_t requestId)
 {
-  int32_t seqid = send_acceptRequest(curId, friendId);
+  int32_t seqid = send_acceptRequest(curId, requestId);
   return recv_acceptRequest(seqid);
 }
 
-int32_t FriendServicesConcurrentClient::send_acceptRequest(const int32_t curId, const int32_t friendId)
+int32_t FriendServicesConcurrentClient::send_acceptRequest(const int32_t curId, const int32_t requestId)
 {
   int32_t cseqid = this->sync_.generateSeqId();
   ::apache::thrift::async::TConcurrentSendSentry sentry(&this->sync_);
@@ -2877,7 +2877,7 @@ int32_t FriendServicesConcurrentClient::send_acceptRequest(const int32_t curId, 
 
   FriendServices_acceptRequest_pargs args;
   args.curId = &curId;
-  args.friendId = &friendId;
+  args.requestId = &requestId;
   args.write(oprot_);
 
   oprot_->writeMessageEnd();
@@ -2948,13 +2948,13 @@ ErrorCode::type FriendServicesConcurrentClient::recv_acceptRequest(const int32_t
   } // end while(true)
 }
 
-ErrorCode::type FriendServicesConcurrentClient::declineRequest(const int32_t curId, const int32_t friendId)
+ErrorCode::type FriendServicesConcurrentClient::declineRequest(const int32_t curId, const int32_t requestId)
 {
-  int32_t seqid = send_declineRequest(curId, friendId);
+  int32_t seqid = send_declineRequest(curId, requestId);
   return recv_declineRequest(seqid);
 }
 
-int32_t FriendServicesConcurrentClient::send_declineRequest(const int32_t curId, const int32_t friendId)
+int32_t FriendServicesConcurrentClient::send_declineRequest(const int32_t curId, const int32_t requestId)
 {
   int32_t cseqid = this->sync_.generateSeqId();
   ::apache::thrift::async::TConcurrentSendSentry sentry(&this->sync_);
@@ -2962,7 +2962,7 @@ int32_t FriendServicesConcurrentClient::send_declineRequest(const int32_t curId,
 
   FriendServices_declineRequest_pargs args;
   args.curId = &curId;
-  args.friendId = &friendId;
+  args.requestId = &requestId;
   args.write(oprot_);
 
   oprot_->writeMessageEnd();

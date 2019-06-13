@@ -189,6 +189,38 @@ void SubKC::loadPending(const std::string& key, std::set<int32_t>& ret){
 		ret.insert(ivalue);
 	}
 }
+
+void SubKC::removePending(const std::string& key, const std::string& value){
+	// remove in pending 
+	int32_t tmp = std::stoi(value);
+	string _value;
+	_dbPending.get(key, _value);
+	
+	for(std::string::iterator it = _value.begin(); it != _value.end(); it+=4){
+		int32_t ivalue = static_cast<int32_t>(
+			static_cast<unsigned char>(it[3]) << 24 |
+			static_cast<unsigned char>(it[2]) << 16 |
+			static_cast<unsigned char>(it[1]) <<  8 |
+			static_cast<unsigned char>(it[0]));
+		
+		if (ivalue == tmp) {
+			_value.erase(it, it+4);
+			_dbPending.set(key, _value);
+			break;
+		}
+	}
+}
+
+bool SubKC::checkRequestExisted(const std::string& key){
+	string value;
+	_dbPending.get(key, value);
+	if (value.size() == 0) return false;
+	
+	// should check sender and receiver???
+	
+	return true;
+}
+
 //------------------------- Friend List -------------------------//
 
 void SubKC::loadFriendList(const std::string& key, std::set<int32_t>& ret, int32_t start_index, int32_t range = 10){
@@ -197,22 +229,35 @@ void SubKC::loadFriendList(const std::string& key, std::set<int32_t>& ret, int32
 	
 	if (value.size() == 0) return; // don't have any data
 	
-	// check out of range
-	bool valid = true;
-	if (value.size() < ((start_index + range) * 4)){
-		range = value.size() - 4 * start_index;
-		range /= 4;
-	}
-	
-	for (std::string::iterator it = value.end() - start_index*4; range > 0; it-=4){
+//	// check out of range
+//	bool valid = true;
+//	if (value.size() < ((start_index + range) * 4)){
+//		range = value.size() - 4 * start_index;
+//		range /= 4;
+//	}
+//	
+//	for (std::string::iterator it = value.end() - start_index*4; range > 0; it-=4){
+//		int32_t ivalue = static_cast<int32_t>(
+//			static_cast<unsigned char>(it[0]) <<  24 |
+//			static_cast<unsigned char>(it[-1]) << 16 |
+//			static_cast<unsigned char>(it[-2]) <<  8 |
+//			static_cast<unsigned char>(it[-3]));
+//		ret.insert(ivalue);
+//		range--;
+//	}
+	for(std::string::iterator it = value.begin(); it != value.end(); it+=4){
 		int32_t ivalue = static_cast<int32_t>(
-			static_cast<unsigned char>(it[0]) <<  24 |
-			static_cast<unsigned char>(it[-1]) << 16 |
-			static_cast<unsigned char>(it[-2]) <<  8 |
-			static_cast<unsigned char>(it[-3]));
+			static_cast<unsigned char>(it[3]) << 24 |
+			static_cast<unsigned char>(it[2]) << 16 |
+			static_cast<unsigned char>(it[1]) <<  8 |
+			static_cast<unsigned char>(it[0]));
 		ret.insert(ivalue);
-		range--;
 	}
+}
+
+void SubKC::addFriend(const std::string& key, const std::string& value){
+	// add to friend db
+	_dbFriend.append(key, value);
 }
 
 //------------------------- Worker Code -------------------------//
@@ -240,6 +285,14 @@ void Worker::run(){
 						
 					case SubKC::DB_TYPE::PENDING:
 						_db->addPending(job->key(), job->value());
+						break;
+						
+					case SubKC::DB_TYPE::FRIEND:
+						_db->addFriend(job->key(), job->value());
+						break;
+						
+					case SubKC::DB_TYPE::REMOVE_PENDING:
+						_db->removePending(job->key(), job->value());
 						break;
 				}
 			}

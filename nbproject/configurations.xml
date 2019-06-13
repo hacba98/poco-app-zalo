@@ -19,8 +19,12 @@
     <itemPath>Converter.h</itemPath>
     <itemPath>FriendServicesHandler.cpp</itemPath>
     <itemPath>FriendServicesHandler.h</itemPath>
+    <itemPath>MyCache.h</itemPath>
+    <itemPath>MyCache.tcc</itemPath>
     <itemPath>MyDB.cpp</itemPath>
     <itemPath>MyDB.h</itemPath>
+    <itemPath>MyList.h</itemPath>
+    <itemPath>MyList.tcc</itemPath>
     <itemPath>SubHandler.cpp</itemPath>
     <itemPath>SubHandler.h</itemPath>
     <itemPath>SubKC.cpp</itemPath>
@@ -90,9 +94,17 @@
       </item>
       <item path="FriendServicesHandler.h" ex="false" tool="3" flavor2="0">
       </item>
+      <item path="MyCache.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="MyCache.tcc" ex="false" tool="3" flavor2="0">
+      </item>
       <item path="MyDB.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="MyDB.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="MyList.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="MyList.tcc" ex="false" tool="3" flavor2="0">
       </item>
       <item path="SubHandler.cpp" ex="false" tool="1" flavor2="0">
       </item>
@@ -150,9 +162,17 @@
       </item>
       <item path="FriendServicesHandler.h" ex="false" tool="3" flavor2="0">
       </item>
+      <item path="MyCache.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="MyCache.tcc" ex="false" tool="3" flavor2="0">
+      </item>
       <item path="MyDB.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="MyDB.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="MyList.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="MyList.tcc" ex="false" tool="3" flavor2="0">
       </item>
       <item path="SubHandler.cpp" ex="false" tool="1" flavor2="0">
       </item>

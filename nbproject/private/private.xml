@@ -9,17 +9,16 @@
         <group>
             <file>file:/home/cpu10855/Projects/ServerApplication/FriendServicesHandler.cpp</file>
             <file>file:/home/cpu10855/Projects/ServerApplication/handler.cpp</file>
+            <file>file:/home/cpu10855/Projects/ServerApplication/FriendServicesHandler.h</file>
             <file>file:/home/cpu10855/Projects/ServerApplication/SubKC.h</file>
             <file>file:/home/cpu10855/Projects/ServerApplication/SubKC.cpp</file>
             <file>file:/home/cpu10855/Projects/ServerApplication/MyDB.cpp</file>
+            <file>file:/home/cpu10855/Projects/ServerApplication/SubHandler.h</file>
+            <file>file:/home/cpu10855/Projects/ServerApplication/friend_service.thrift</file>
             <file>file:/home/cpu10855/Projects/ServerApplication/MyDB.h</file>
             <file>file:/home/cpu10855/Projects/ServerApplication/main.cpp</file>
             <file>file:/home/cpu10855/Projects/ServerApplication/SubHandler.cpp</file>
             <file>file:/home/cpu10855/Projects/ServerApplication/Converter.h</file>
-            <file>file:/home/cpu10855/Projects/ServerApplication/gen-cpp/FriendServices.h</file>
-            <file>file:/home/cpu10855/Projects/ServerApplication/FriendServicesHandler.h</file>
-            <file>file:/home/cpu10855/Projects/ServerApplication/SubHandler.h</file>
-            <file>file:/home/cpu10855/Projects/ServerApplication/friend_service.thrift</file>
         </group>
     </open-files>
 </project-private>

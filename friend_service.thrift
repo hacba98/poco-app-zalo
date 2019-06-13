@@ -85,10 +85,10 @@ service FriendServices{
 	ErrorCode addFriend(1: FriendRequest request);
 	
 	// Accept request
-	ErrorCode acceptRequest(1: i32 curId, 2: i32 friendId);
+	ErrorCode acceptRequest(1: i32 curId, 2: i32 requestId);
 
 	// Decline request
-	ErrorCode declineRequest(1: i32 curId, 2: i32 friendId);
+	ErrorCode declineRequest(1: i32 curId, 2: i32 requestId);
 
 	// Remove a friend
 	ErrorCode removeFriend(1: i32 curId, 2: i32 friendId);

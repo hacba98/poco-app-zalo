@@ -36,7 +36,7 @@ public:
 	// Friend function API
 	virtual void checkRequest(pingResult& _return, const int32_t id);
 	virtual ErrorCode::type addFriend(const FriendRequest& request);
-	virtual ErrorCode::type acceptRequest(const int32_t curId, const int32_t friendId);
+	virtual ErrorCode::type acceptRequest(const int32_t curId, const int32_t requestId);
 	virtual ErrorCode::type declineRequest(const int32_t curId, const int32_t friendId);
 	virtual ErrorCode::type removeFriend(const int32_t curId, const int32_t friendId);
 	virtual void viewFriendList(listFriendResult& _return, const int32_t id, const int32_t index, const int32_t size);

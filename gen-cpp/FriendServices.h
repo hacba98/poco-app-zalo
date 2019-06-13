@@ -25,8 +25,8 @@ class FriendServicesIf {
   virtual void GetUserInformation(GetUserResult& _return, const int32_t id) = 0;
   virtual void checkRequest(pingResult& _return, const int32_t id) = 0;
   virtual ErrorCode::type addFriend(const FriendRequest& request) = 0;
-  virtual ErrorCode::type acceptRequest(const int32_t curId, const int32_t friendId) = 0;
-  virtual ErrorCode::type declineRequest(const int32_t curId, const int32_t friendId) = 0;
+  virtual ErrorCode::type acceptRequest(const int32_t curId, const int32_t requestId) = 0;
+  virtual ErrorCode::type declineRequest(const int32_t curId, const int32_t requestId) = 0;
   virtual ErrorCode::type removeFriend(const int32_t curId, const int32_t friendId) = 0;
   virtual void viewFriendList(listFriendResult& _return, const int32_t id, const int32_t index, const int32_t size) = 0;
 };
@@ -72,11 +72,11 @@ class FriendServicesNull : virtual public FriendServicesIf {
     ErrorCode::type _return = (ErrorCode::type)0;
     return _return;
   }
-  ErrorCode::type acceptRequest(const int32_t /* curId */, const int32_t /* friendId */) {
+  ErrorCode::type acceptRequest(const int32_t /* curId */, const int32_t /* requestId */) {
     ErrorCode::type _return = (ErrorCode::type)0;
     return _return;
   }
-  ErrorCode::type declineRequest(const int32_t /* curId */, const int32_t /* friendId */) {
+  ErrorCode::type declineRequest(const int32_t /* curId */, const int32_t /* requestId */) {
     ErrorCode::type _return = (ErrorCode::type)0;
     return _return;
   }
@@ -506,9 +506,9 @@ class FriendServices_addFriend_presult {
 };
 
 typedef struct _FriendServices_acceptRequest_args__isset {
-  _FriendServices_acceptRequest_args__isset() : curId(false), friendId(false) {}
+  _FriendServices_acceptRequest_args__isset() : curId(false), requestId(false) {}
   bool curId :1;
-  bool friendId :1;
+  bool requestId :1;
 } _FriendServices_acceptRequest_args__isset;
 
 class FriendServices_acceptRequest_args {
@@ -516,24 +516,24 @@ class FriendServices_acceptRequest_args {
 
   FriendServices_acceptRequest_args(const FriendServices_acceptRequest_args&);
   FriendServices_acceptRequest_args& operator=(const FriendServices_acceptRequest_args&);
-  FriendServices_acceptRequest_args() : curId(0), friendId(0) {
+  FriendServices_acceptRequest_args() : curId(0), requestId(0) {
   }
 
   virtual ~FriendServices_acceptRequest_args() throw();
   int32_t curId;
-  int32_t friendId;
+  int32_t requestId;
 
   _FriendServices_acceptRequest_args__isset __isset;
 
   void __set_curId(const int32_t val);
 
-  void __set_friendId(const int32_t val);
+  void __set_requestId(const int32_t val);
 
   bool operator == (const FriendServices_acceptRequest_args & rhs) const
   {
     if (!(curId == rhs.curId))
       return false;
-    if (!(friendId == rhs.friendId))
+    if (!(requestId == rhs.requestId))
       return false;
     return true;
   }
@@ -555,7 +555,7 @@ class FriendServices_acceptRequest_pargs {
 
   virtual ~FriendServices_acceptRequest_pargs() throw();
   const int32_t* curId;
-  const int32_t* friendId;
+  const int32_t* requestId;
 
   uint32_t write(::apache::thrift::protocol::TProtocol* oprot) const;
 
@@ -617,9 +617,9 @@ class FriendServices_acceptRequest_presult {
 };
 
 typedef struct _FriendServices_declineRequest_args__isset {
-  _FriendServices_declineRequest_args__isset() : curId(false), friendId(false) {}
+  _FriendServices_declineRequest_args__isset() : curId(false), requestId(false) {}
   bool curId :1;
-  bool friendId :1;
+  bool requestId :1;
 } _FriendServices_declineRequest_args__isset;
 
 class FriendServices_declineRequest_args {
@@ -627,24 +627,24 @@ class FriendServices_declineRequest_args {
 
   FriendServices_declineRequest_args(const FriendServices_declineRequest_args&);
   FriendServices_declineRequest_args& operator=(const FriendServices_declineRequest_args&);
-  FriendServices_declineRequest_args() : curId(0), friendId(0) {
+  FriendServices_declineRequest_args() : curId(0), requestId(0) {
   }
 
   virtual ~FriendServices_declineRequest_args() throw();
   int32_t curId;
-  int32_t friendId;
+  int32_t requestId;
 
   _FriendServices_declineRequest_args__isset __isset;
 
   void __set_curId(const int32_t val);
 
-  void __set_friendId(const int32_t val);
+  void __set_requestId(const int32_t val);
 
   bool operator == (const FriendServices_declineRequest_args & rhs) const
   {
     if (!(curId == rhs.curId))
       return false;
-    if (!(friendId == rhs.friendId))
+    if (!(requestId == rhs.requestId))
       return false;
     return true;
   }
@@ -666,7 +666,7 @@ class FriendServices_declineRequest_pargs {
 
   virtual ~FriendServices_declineRequest_pargs() throw();
   const int32_t* curId;
-  const int32_t* friendId;
+  const int32_t* requestId;
 
   uint32_t write(::apache::thrift::protocol::TProtocol* oprot) const;
 
@@ -993,11 +993,11 @@ class FriendServicesClient : virtual public FriendServicesIf {
   ErrorCode::type addFriend(const FriendRequest& request);
   void send_addFriend(const FriendRequest& request);
   ErrorCode::type recv_addFriend();
-  ErrorCode::type acceptRequest(const int32_t curId, const int32_t friendId);
-  void send_acceptRequest(const int32_t curId, const int32_t friendId);
+  ErrorCode::type acceptRequest(const int32_t curId, const int32_t requestId);
+  void send_acceptRequest(const int32_t curId, const int32_t requestId);
   ErrorCode::type recv_acceptRequest();
-  ErrorCode::type declineRequest(const int32_t curId, const int32_t friendId);
-  void send_declineRequest(const int32_t curId, const int32_t friendId);
+  ErrorCode::type declineRequest(const int32_t curId, const int32_t requestId);
+  void send_declineRequest(const int32_t curId, const int32_t requestId);
   ErrorCode::type recv_declineRequest();
   ErrorCode::type removeFriend(const int32_t curId, const int32_t friendId);
   void send_removeFriend(const int32_t curId, const int32_t friendId);
@@ -1105,22 +1105,22 @@ class FriendServicesMultiface : virtual public FriendServicesIf {
     return ifaces_[i]->addFriend(request);
   }
 
-  ErrorCode::type acceptRequest(const int32_t curId, const int32_t friendId) {
+  ErrorCode::type acceptRequest(const int32_t curId, const int32_t requestId) {
     size_t sz = ifaces_.size();
     size_t i = 0;
     for (; i < (sz - 1); ++i) {
-      ifaces_[i]->acceptRequest(curId, friendId);
+      ifaces_[i]->acceptRequest(curId, requestId);
     }
-    return ifaces_[i]->acceptRequest(curId, friendId);
+    return ifaces_[i]->acceptRequest(curId, requestId);
   }
 
-  ErrorCode::type declineRequest(const int32_t curId, const int32_t friendId) {
+  ErrorCode::type declineRequest(const int32_t curId, const int32_t requestId) {
     size_t sz = ifaces_.size();
     size_t i = 0;
     for (; i < (sz - 1); ++i) {
-      ifaces_[i]->declineRequest(curId, friendId);
+      ifaces_[i]->declineRequest(curId, requestId);
     }
-    return ifaces_[i]->declineRequest(curId, friendId);
+    return ifaces_[i]->declineRequest(curId, requestId);
   }
 
   ErrorCode::type removeFriend(const int32_t curId, const int32_t friendId) {
@@ -1184,11 +1184,11 @@ class FriendServicesConcurrentClient : virtual public FriendServicesIf {
   ErrorCode::type addFriend(const FriendRequest& request);
   int32_t send_addFriend(const FriendRequest& request);
   ErrorCode::type recv_addFriend(const int32_t seqid);
-  ErrorCode::type acceptRequest(const int32_t curId, const int32_t friendId);
-  int32_t send_acceptRequest(const int32_t curId, const int32_t friendId);
+  ErrorCode::type acceptRequest(const int32_t curId, const int32_t requestId);
+  int32_t send_acceptRequest(const int32_t curId, const int32_t requestId);
   ErrorCode::type recv_acceptRequest(const int32_t seqid);
-  ErrorCode::type declineRequest(const int32_t curId, const int32_t friendId);
-  int32_t send_declineRequest(const int32_t curId, const int32_t friendId);
+  ErrorCode::type declineRequest(const int32_t curId, const int32_t requestId);
+  int32_t send_declineRequest(const int32_t curId, const int32_t requestId);
   ErrorCode::type recv_declineRequest(const int32_t seqid);
   ErrorCode::type removeFriend(const int32_t curId, const int32_t friendId);
   int32_t send_removeFriend(const int32_t curId, const int32_t friendId);

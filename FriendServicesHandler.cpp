@@ -157,7 +157,33 @@ ErrorCode::type FriendServicesHandler::addFriend(const FriendRequest& request){
 	return ErrorCode::type::SUCCESS;
 }
 
-ErrorCode::type FriendServicesHandler::acceptRequest(const int32_t curId, const int32_t friendId){
+ErrorCode::type FriendServicesHandler::acceptRequest(const int32_t curId, const int32_t requestId){
+	Application::instance().logger().information("Add friend request");
+	
+	// check user existed
+	string uid = to_string(curId);
+	string reqid = to_string(requestId);
+	if (!_kc.checkUserExisted(uid) && !_kc.checkRequestExisted(reqid)){
+		return ErrorCode::USER_NOT_FOUND;
+	}
+	
+	// using request id to retrieve sender and receiver
+	// cache
+	// db
+	string value;
+	FriendRequest tmp;
+	_kc.loadRequest(reqid, value);
+	
+	if (value.size() == 0) return ErrorCode::INVALID_PARAMETER;
+	
+	_convert_req.deserialize(value, tmp);
+	
+	if (to_string(tmp.p_recv_req) != uid) return ErrorCode::INVALID_PARAMETER;
+	
+	// async call
+	_kc.store(uid, reqid, SubKC::DB_TYPE::REMOVE_PENDING);
+	_kc.store(uid, to_string(tmp.p_send_req), SubKC::DB_TYPE::FRIEND);
+	
 	return ErrorCode::SUCCESS;
 }
 

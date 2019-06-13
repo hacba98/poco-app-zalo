@@ -48,6 +48,7 @@ enum DB_TYPE {
 	FRIEND,
 	PENDING,
 	REQUEST,
+	REMOVE_PENDING,
 	SIZE_OF_MVEC,
 };
 	SubKC();
@@ -74,10 +75,11 @@ enum DB_TYPE {
 	// method to work with pending and friend database
 	void addPending (const std::string& key, const std::string& value);
 	void loadPending (const std::string& key, std::set<int32_t>& ret);
-	void removePending (const std::string& key);
-	void addFriendList (const std::string& key);
-	void removeFriendList (const std::string& key);
-	void loadFriendList (const std::string& key, std::set<int32_t>& ret, int32_t start_index, int32_t range); // remember paging
+	void removePending (const std::string& key, const std::string& value);
+	void addFriend (const std::string& key, const std::string& value);
+	void removeFriend (const std::string& key, const std::string& value);
+	void loadFriendList (const std::string& key, std::set<int32_t>& ret, std::int32_t start_index, std::int32_t range); // remember paging
+	bool checkRequestExisted (const std::string& key);
 	
 	void acceptFriend(const std::string& key, const std::string& request_id);
 	void declineFriend(const std::string& key, const std::string& request_id);
