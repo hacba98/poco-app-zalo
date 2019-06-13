@@ -1,0 +1,34 @@
+Server is starting at port 8008
+Server is starting at port 8008
+Server is starting at port 8008
+Server is starting at port 8008
+Incoming register request.
+User register successfully. User's id: 42
+Server is starting at port 8008
+Incoming register request.
+User register successfully. User's id: 43
+Server is starting at port 8080
+Incoming register request.
+User register successfully. User's id: 44
+Incoming register request.
+User register successfully. User's id: 45
+Incoming register request.
+User register successfully. User's id: 46
+Incoming register request.
+User register successfully. User's id: 47
+Incoming register request.
+User register successfully. User's id: 48
+Incoming get data request.
+Incoming get data request.
+Server is starting at port 8080
+Incoming register request.
+User register successfully. User's id: 49
+Incoming register request.
+Server is starting at port 8080
+Incoming register request.
+User register successfully. User's id: 51
+Server is starting at port 8080
+Incoming register request.
+User register successfully. User's id: 52
+Server is starting at port 8080
+Incoming register request.

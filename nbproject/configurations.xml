@@ -1,0 +1,186 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configurationDescriptor version="100">
+  <logicalFolder name="root" displayName="root" projectFiles="true" kind="ROOT">
+    <logicalFolder name="gen-cpp" displayName="gen-cpp" projectFiles="true">
+      <itemPath>gen-cpp/FriendServices.cpp</itemPath>
+      <itemPath>gen-cpp/FriendServices.h</itemPath>
+      <itemPath>gen-cpp/friend_service_constants.cpp</itemPath>
+      <itemPath>gen-cpp/friend_service_constants.h</itemPath>
+      <itemPath>gen-cpp/friend_service_types.cpp</itemPath>
+      <itemPath>gen-cpp/friend_service_types.h</itemPath>
+    </logicalFolder>
+    <logicalFolder name="ExternalFiles"
+                   displayName="Important Files"
+                   projectFiles="false"
+                   kind="IMPORTANT_FILES_FOLDER">
+      <itemPath>Makefile</itemPath>
+    </logicalFolder>
+    <itemPath>Converter.cpp</itemPath>
+    <itemPath>Converter.h</itemPath>
+    <itemPath>FriendServicesHandler.cpp</itemPath>
+    <itemPath>FriendServicesHandler.h</itemPath>
+    <itemPath>MyDB.cpp</itemPath>
+    <itemPath>MyDB.h</itemPath>
+    <itemPath>SubHandler.cpp</itemPath>
+    <itemPath>SubHandler.h</itemPath>
+    <itemPath>SubKC.cpp</itemPath>
+    <itemPath>SubKC.h</itemPath>
+    <itemPath>friend_service.thrift</itemPath>
+    <itemPath>main.cpp</itemPath>
+  </logicalFolder>
+  <sourceRootList>
+    <Elem>gen-cpp</Elem>
+  </sourceRootList>
+  <projectmakefile>Makefile</projectmakefile>
+  <confs>
+    <conf name="Debug" type="1">
+      <toolsSet>
+        <compilerSet>default</compilerSet>
+        <dependencyChecking>true</dependencyChecking>
+        <rebuildPropChanged>false</rebuildPropChanged>
+      </toolsSet>
+      <compileType>
+        <ccTool>
+          <standard>8</standard>
+          <incDir>
+            <pElem>../Poco/include</pElem>
+            <pElem>../KC</pElem>
+          </incDir>
+        </ccTool>
+        <linkerTool>
+          <linkerAddLib>
+            <pElem>../Poco</pElem>
+            <pElem>../KC</pElem>
+          </linkerAddLib>
+          <linkerCopySharedLibs>true</linkerCopySharedLibs>
+          <linkerLibItems>
+            <linkerLibProjectItem>
+              <makeArtifact PL="../Poco"
+                            CT="3"
+                            CN="Debug"
+                            AC="true"
+                            BL="false"
+                            WD="../Poco"
+                            BC="${MAKE} -j 6 -f Makefile CONF=Debug"
+                            CC="${MAKE} -j 6 -f Makefile CONF=Debug clean"
+                            OP="libpoco.a">
+              </makeArtifact>
+            </linkerLibProjectItem>
+            <linkerLibProjectItem>
+              <makeArtifact PL="../KC"
+                            CT="3"
+                            CN="Debug"
+                            AC="true"
+                            BL="false"
+                            WD="../KC"
+                            BC="${MAKE} -j 6 -f Makefile CONF=Debug"
+                            CC="${MAKE} -j 6 -f Makefile CONF=Debug clean"
+                            OP="libkc.a">
+              </makeArtifact>
+            </linkerLibProjectItem>
+          </linkerLibItems>
+          <commandLine>-pthread -lthrift</commandLine>
+        </linkerTool>
+      </compileType>
+      <item path="Converter.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="Converter.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="FriendServicesHandler.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="FriendServicesHandler.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="MyDB.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="MyDB.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="SubHandler.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="SubHandler.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="SubKC.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="SubKC.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="friend_service.thrift" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="gen-cpp/FriendServices.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="gen-cpp/FriendServices.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="gen-cpp/friend_service_constants.cpp"
+            ex="false"
+            tool="1"
+            flavor2="0">
+      </item>
+      <item path="gen-cpp/friend_service_constants.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="gen-cpp/friend_service_types.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="gen-cpp/friend_service_types.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="main.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+    </conf>
+    <conf name="Release" type="1">
+      <toolsSet>
+        <compilerSet>default</compilerSet>
+        <dependencyChecking>true</dependencyChecking>
+        <rebuildPropChanged>false</rebuildPropChanged>
+      </toolsSet>
+      <compileType>
+        <cTool>
+          <developmentMode>5</developmentMode>
+        </cTool>
+        <ccTool>
+          <developmentMode>5</developmentMode>
+        </ccTool>
+        <fortranCompilerTool>
+          <developmentMode>5</developmentMode>
+        </fortranCompilerTool>
+        <asmTool>
+          <developmentMode>5</developmentMode>
+        </asmTool>
+      </compileType>
+      <item path="Converter.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="Converter.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="FriendServicesHandler.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="FriendServicesHandler.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="MyDB.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="MyDB.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="SubHandler.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="SubHandler.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="SubKC.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="SubKC.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="friend_service.thrift" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="gen-cpp/FriendServices.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="gen-cpp/FriendServices.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="gen-cpp/friend_service_constants.cpp"
+            ex="false"
+            tool="1"
+            flavor2="0">
+      </item>
+      <item path="gen-cpp/friend_service_constants.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="gen-cpp/friend_service_types.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="gen-cpp/friend_service_types.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="main.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+    </conf>
+  </confs>
+</configurationDescriptor>

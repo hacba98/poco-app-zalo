@@ -1,0 +1,47 @@
+stoi
+stoi
+stoi
+Server is starting at port 8080
+Server is starting at port 8080
+Incoming register request.
+User register successfully. User's id: 800
+Incoming register request.
+User register successfully. User's id: 801
+Incoming get data request.
+Incoming get data request.
+Incoming add friend request
+Checking friend pending request.
+Server is starting at port 8080
+Incoming register request.
+User register successfully. User's id: 0
+Incoming register request.
+User register successfully. User's id: 1
+Incoming get data request.
+Incoming get data request.
+Incoming add friend request
+Checking friend pending request.
+Incoming register request.
+Server is starting at port 8080
+Incoming register request.
+User register successfully. User's id: 10
+Incoming register request.
+User register successfully. User's id: 11
+Incoming get data request.
+Incoming get data request.
+Incoming add friend request
+Checking friend pending request.
+Server is starting at port 8080
+Incoming register request.
+User register successfully. User's id: 20
+Incoming register request.
+User register successfully. User's id: 21
+Incoming register request.
+User register successfully. User's id: 22
+Incoming register request.
+User register successfully. User's id: 23
+Incoming get data request.
+Incoming get data request.
+Incoming add friend request
+Incoming add friend request
+Incoming add friend request
+Checking friend pending request.
