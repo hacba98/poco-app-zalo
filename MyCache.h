@@ -36,6 +36,7 @@ public:
 	};
 	
 	virtual ~IMyCache() = default;
+	IMyCache(const char* name): _name(name){};
 	
 	// core
 //	virtual bool check = 0;
@@ -49,8 +50,15 @@ public:
 	//virtual void setCapacity(std::uint32_t) = 0;
 	//virtual void setPolicy(POLICY new_policy) = 0;
     
-	//virtual double hitPercentage() = 0;
-	//virtual const char * name() = 0;
+	inline double hitPercentage() { return _hit * 1.0 / (_hit + _miss); }
+	inline const char * name() { return _name; } 
+protected:
+	// for statistic only
+	std::int32_t _hit;
+	std::int32_t _miss;
+
+	// identifier: all in lower-case. Ex: friend.cache.user,...
+	const char* _name;
 };
 
 template <typename TKEY, typename TDATA>
@@ -59,8 +67,8 @@ class MyCache : public IMyCache
 public:
 
     // constructors
-    MyCache(std::int32_t size, MyCache::POLICY policy, std::string name): 
-	_capacity(size), _policy(policy), _mutex(), _name(name.c_str()){
+    MyCache(std::int32_t size, MyCache::POLICY policy, std::string name): IMyCache(name.c_str()),
+	_capacity(size), _policy(policy), _mutex(){
 	    initialize();
     }
     ~MyCache(){};
@@ -80,9 +88,6 @@ public:
     inline bool available() { return _current < _capacity; }
     inline void setCapacity(std::uint32_t new_capacity) { _capacity = new_capacity; } // have to resize mem_storage
     inline void setPolicy(POLICY new_policy){ _policy = new_policy;}
-    
-    inline double hitPercentage() { return _hit * 1.0 / (_hit + _miss); }
-    inline const char * name() { return _name; } 
 
 private:
     // policy for remove element out of cache when reach max capacity
@@ -103,13 +108,6 @@ private:
     std::uint32_t _capacity;
     std::uint32_t _current;
     Poco::Mutex _mutex;
-    
-    // for statistic only
-    std::int32_t _hit;
-    std::int32_t _miss;
-    
-    // identifier: all in lower-case. Ex: friend.cache.user,...
-    const char* _name;
     
     void _clear(std::vector<TKEY> candidates);
 };

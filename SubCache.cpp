@@ -50,6 +50,11 @@ void SubCache::initialize(Poco::Util::Application& app){
 void SubCache::uninitialize(){
 	// what to do here?
 	// cache auto delete when obj delete
+	// print out hit rate
+	for (int i=0; i < _caches.size(); i++){
+		Poco::Util::Application::instance().logger().information(
+			Poco::Logger::format("Hit rate of $0 = $1.", _caches[i]->name(), to_string(_caches[i]->hitPercentage())));
+	}
 }
 
 void SubCache::defineOptions(Poco::Util::OptionSet& options){

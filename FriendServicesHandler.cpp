@@ -70,6 +70,7 @@ int32_t FriendServicesHandler::CreateUser(const InputProfileData& profile){
 	_kc.store(id_str, value, SubKC::DB_TYPE::USER);
 	
 	// also store in cache
+	// TODO put into NotificationQueue
 	_cache.put<string, User>("friend.cache.user", id_str, newUser);
 	
 	// log 

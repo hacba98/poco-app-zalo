@@ -55,7 +55,8 @@ bool MyCache<TKEY, TDATA>::get(const TKEY& key, TDATA& data_){
 	// retrieve real data in memory storage
 	data_ = it->second->getData();
 	// update top using LRU strategy
-	_mem_storage->reorder(it->second);
+	auto addr = it->second;
+	_mem_storage->reorder(addr);
 	_hit++;
 	return true;
 }

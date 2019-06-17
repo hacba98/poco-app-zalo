@@ -29,10 +29,10 @@
 
 class SubCache : public Poco::Util::Subsystem {
 public:
-	
+
 	SubCache();
 	~SubCache();
-	
+
 	//
 	// inlines
 	//
@@ -44,19 +44,19 @@ public:
 	//
 	template <typename K, typename C>
 	bool check(const std::string& name, const K& key);
-	
+
 protected:
 	virtual void initialize(Poco::Util::Application& app);
 	virtual void uninitialize();
 	virtual void defineOptions(Poco::Util::OptionSet& options);
 	virtual const char* name() const;
-	
+
 private:
 	// big cache 
 	std::vector<std::unique_ptr<IMyCache>> _caches;
-	
+
 	// small cache
-	
+
 	// configurations
 	std::uint32_t _small_size;
 	std::uint32_t _large_size;
@@ -65,39 +65,39 @@ private:
 
 };
 
-template <typename K, typename C> bool SubCache::get(const std::string& name, K& key, C& ret){
-	for (int i=0; i < _caches.size(); i++){
-		MyCache<K,C> *pC = dynamic_cast<MyCache<K,C>*>(_caches[i].get());
-		if (pC->name() == name){
+template <typename K, typename C> bool SubCache::get(const std::string& name, K& key, C& ret) {
+	for (int i = 0; i < _caches.size(); i++) {
+		MyCache<K, C> *pC = dynamic_cast<MyCache<K, C>*> (_caches[i].get());
+		if (pC) {
 			if (pC->get(key, ret)) // found in cache
 				return true;
 			return false;
-		}	
+		}
 	}
 	Poco::Util::Application::instance().logger().debug("Wrong cache name");
 	return false;
 };
 
-template <typename K, typename C> void SubCache::put(const std::string& name, const K& key, const C& value){
-	for (int i=0; i < _caches.size(); i++){
-		MyCache<K,C> *pC = dynamic_cast<MyCache<K,C>*>(_caches[i].get());
-		if (pC->name() == name){
+template <typename K, typename C> void SubCache::put(const std::string& name, const K& key, const C& value) {
+	for (int i = 0; i < _caches.size(); i++) {
+		MyCache<K, C> *pC = dynamic_cast<MyCache<K, C>*> (_caches[i].get());
+		if (pC) {
 			pC->put(key, value);
 			return;
-		}	
+		}
 	}
 	Poco::Util::Application::instance().logger().debug("Wrong cache name");
 	return;
 }
 
-template <typename K, typename C> bool SubCache::check(const std::string& name, const K& key){
-	for (int i=0; i < _caches.size(); i++){
-		MyCache<K,C> *pC = dynamic_cast<MyCache<K,C>*>(_caches[i].get());
-		if (pC->name() == name){
+template <typename K, typename C> bool SubCache::check(const std::string& name, const K& key) {
+	for (int i = 0; i < _caches.size(); i++) {
+		MyCache<K, C> *pC = dynamic_cast<MyCache<K, C>*> (_caches[i].get());
+		if(pC){
 			if (pC->check(key)) // found in cache
 				return true;
 			return false;
-		}	
+		}
 	}
 	Poco::Util::Application::instance().logger().debug("Wrong cache name");
 	return false;

@@ -120,7 +120,7 @@ protected:
 			// Run
 			runSystem();
 			waitForTerminationRequest();
-
+			uninitialize();
 		}
 		return Application::EXIT_OK;
 	}

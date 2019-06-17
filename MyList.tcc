@@ -19,19 +19,21 @@ using namespace std;
 template <typename K, typename T>
 bool DoubleNode<K, T>::putNext(DoubleNode<K, T> *next)
 {
-    if (next == NULL)
-        return false;
-    _next = next;
-    return true;
+	bool ret = true;
+	if (next == NULL)
+	    ret = false;
+	_next = next;
+	return ret;
 }
 
 template <typename K, typename T>
 bool DoubleNode<K, T>::putPrev(DoubleNode<K, T> *prev)
 {
-    if (prev == NULL)
-        return false;
-    _prev = prev;
-    return true;
+	bool ret = true;
+	if (prev == NULL)
+	    ret = false;
+	_prev = prev;
+	return ret;
 }
 
 // list class
@@ -63,30 +65,34 @@ void MyList<TKEY, TDATA>::initialize()
 template <typename TKEY, typename TDATA>
 void MyList<TKEY, TDATA>::reorder(DoubleNode<TKEY, TDATA> *ele)
 {
-    // get it out of chain -> connect prev and next node
-    ele->getPrev()->putNext(ele->getNext());
-    if (_tail == ele)
-        _tail = ele->getPrev();
-    else
-        ele->getNext()->putPrev(ele->getPrev());
+	// get it out of chain -> connect prev and next node
+	if (ele == _head)
+		return;
+	ele->getPrev()->putNext(ele->getNext());
+	if (_tail == ele)
+	    _tail = ele->getPrev();
+	else
+	    ele->getNext()->putPrev(ele->getPrev());
 
-    // put to front -> next is current head & prev is null
-    bool ok_ = ele->putNext(_head) && ele->putPrev(NULL);
+	// put to front -> next is current head & prev is null
+	bool ok_ = ele->putNext(_head);
+	ok_ = ele->putPrev(NULL) && ok_;
+	ok_ = _head->putPrev(ele) && ok_;
 
-    // update new head
-    _head = ele;
+	// update new head
+	_head = ele;
 }
 
 template <typename TKEY, typename TDATA>
 DoubleNode<TKEY, TDATA> *MyList<TKEY, TDATA>::add(TKEY key, TDATA data)
 {
-    // set data to last node
-    DoubleNode<TKEY, TDATA> *ret = _tail;
-    ret->set(key, data);
-    // put that node to front
-    reorder(ret);
-    // return address of that node
-    return ret;
+	// set data to last node
+	DoubleNode<TKEY, TDATA> *ret = _tail;
+	ret->set(key, data);
+	// put that node to front
+	reorder(ret);
+	// return address of that node
+	return ret;
 }
 
 template <typename TKEY, typename TDATA>
