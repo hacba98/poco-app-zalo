@@ -24,6 +24,7 @@
 
 #include "SubKC.h" // for DB subsystem
 #include "SubHandler.h" // for server subsystem
+#include "SubCache.h" // for cache subsystem
 
 using namespace Poco;
 using namespace Poco::Util;
@@ -53,9 +54,11 @@ protected:
 		// register sub system in here
 		// Should have 2 subsystems upto now in this project
 		// 1: Request handler
-		// 2: Database - Caching ? should we split it?
+		// 2: Database - 
+		// 3: Cache
 		addSubsystem(new SubKC());
 		addSubsystem(new SubHandler());
+		addSubsystem(new SubCache());
 
 
 		// initialize application's subsystems

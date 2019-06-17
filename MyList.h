@@ -43,8 +43,8 @@ public:
     inline DoubleNode<K, T> * getNext() {return _next;}
     inline DoubleNode<K, T> * getPrev() {return _prev;}
     
-    bool putNext(const DoubleNode<K, T> *next); // return false if next == null
-    bool putPrev(const DoubleNode<K, T> *prev);
+    bool putNext(DoubleNode<K, T> *next); // return false if next == null
+    bool putPrev(DoubleNode<K, T> *prev);
     
 
 private:

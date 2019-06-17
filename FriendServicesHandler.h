@@ -19,6 +19,7 @@
 
 #include "gen-cpp/FriendServices.h"
 #include "SubKC.h"
+#include "SubCache.h"
 #include "Converter.h"
 
 #include <thrift/TToString.h>
@@ -44,6 +45,7 @@ public:
 private:
 	//Poco::Util::Application& _app;
 	SubKC& _kc = Poco::Util::Application::instance().getSubsystem<SubKC>();
+	SubCache& _cache = Poco::Util::Application::instance().getSubsystem<SubCache>();
 	Converter<User> _convert_user;
 	Converter<FriendRequest> _convert_req;
 };

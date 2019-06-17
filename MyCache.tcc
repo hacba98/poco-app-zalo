@@ -22,7 +22,7 @@ template <typename TKEY, typename TDATA>
 void MyCache<TKEY, TDATA>::initialize(){
 	_current = 0;
 	_hit = _miss = 1; // Laplace smoothing 
-	_mem_storage = new MyList<TKEY, TDATA>(_capacity);
+	_mem_storage = std::shared_ptr<MyList<TKEY, TDATA>>(new MyList<TKEY, TDATA>(_capacity));
 }
 
 // ------------ CORE ----------------
@@ -46,7 +46,7 @@ bool MyCache<TKEY, TDATA>::check(const TKEY& key){
 template <typename TKEY, typename TDATA>
 bool MyCache<TKEY, TDATA>::get(const TKEY& key, TDATA& data_){
 	// get in hash map
-	typename std::map<TKEY, DoubleNode<TKEY, TDATA>>::iterator it = _mapping.find(key);
+	typename std::map<TKEY, DoubleNode<TKEY, TDATA>*>::iterator it = _mapping.find(key);
 	if (it == _mapping.end()) {
 		_miss++;
 		return false;
@@ -69,6 +69,7 @@ bool MyCache<TKEY, TDATA>::get(const TKEY& key, TDATA& data_){
 template <typename TKEY, typename TDATA>
 void MyCache<TKEY, TDATA>::put(const TKEY& key, const TDATA& data){
 	// store in memory storage -> return address -> store in hash map
+	Poco::Mutex::ScopedLock lock(_mutex);
 	_mapping[key] = _mem_storage->add(key, data);
 	
 	// check if it still have space
@@ -83,6 +84,7 @@ void MyCache<TKEY, TDATA>::put(const TKEY& key, const TDATA& data){
  */
 template <typename TKEY, typename TDATA>
 void MyCache<TKEY, TDATA>::_clear(std::vector<TKEY> candidates){
+	Poco::Mutex::ScopedLock lock(_mutex);
 	for (int i=0; i < candidates.size(); i++){
 		_mapping.erase(candidates[i]);
 	}

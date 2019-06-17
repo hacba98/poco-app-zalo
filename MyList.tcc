@@ -17,7 +17,7 @@ using namespace std;
 
 // element class
 template <typename K, typename T>
-bool DoubleNode<K, T>::putNext(const DoubleNode<K, T> *next)
+bool DoubleNode<K, T>::putNext(DoubleNode<K, T> *next)
 {
     if (next == NULL)
         return false;
@@ -26,7 +26,7 @@ bool DoubleNode<K, T>::putNext(const DoubleNode<K, T> *next)
 }
 
 template <typename K, typename T>
-bool DoubleNode<K, T>::putPrev(const DoubleNode<K, T> *prev)
+bool DoubleNode<K, T>::putPrev(DoubleNode<K, T> *prev)
 {
     if (prev == NULL)
         return false;
@@ -42,13 +42,13 @@ void MyList<TKEY, TDATA>::initialize()
     DoubleNode<TKEY, TDATA> *tail = new DoubleNode<TKEY, TDATA>();
 
     if (!tail->putPrev(head) || !head->putNext(tail))
-        throw Poco::Exception("Cannot initialize cache. Error at allocated step.");
+        throw Poco::Exception("Cannot initialize cache. Error at allocated step 1.");
 
     for (int i = 0; i < _size; i++)
     {
         DoubleNode<TKEY, TDATA> *tmp = new DoubleNode<TKEY, TDATA>();
-        if (!tail->putNext(tmp) || tmp->putPrev(tail))
-            throw Poco::Exception("Cannot initialize cache. Error at allocated step.");
+        if (!tail->putNext(tmp) || !tmp->putPrev(tail))
+            throw Poco::Exception("Cannot initialize cache. Error at allocated step 2.");
         tail = tmp;
     }
 

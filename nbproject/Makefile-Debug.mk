@@ -38,6 +38,7 @@ OBJECTFILES= \
 	${OBJECTDIR}/Converter.o \
 	${OBJECTDIR}/FriendServicesHandler.o \
 	${OBJECTDIR}/MyDB.o \
+	${OBJECTDIR}/SubCache.o \
 	${OBJECTDIR}/SubHandler.o \
 	${OBJECTDIR}/SubKC.o \
 	${OBJECTDIR}/gen-cpp/FriendServices.o \
@@ -88,6 +89,11 @@ ${OBJECTDIR}/MyDB.o: MyDB.cpp
 	${MKDIR} -p ${OBJECTDIR}
 	${RM} "$@.d"
 	$(COMPILE.cc) -g -I../Poco/include -I../KC -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/MyDB.o MyDB.cpp
+
+${OBJECTDIR}/SubCache.o: SubCache.cpp
+	${MKDIR} -p ${OBJECTDIR}
+	${RM} "$@.d"
+	$(COMPILE.cc) -g -I../Poco/include -I../KC -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/SubCache.o SubCache.cpp
 
 ${OBJECTDIR}/SubHandler.o: SubHandler.cpp
 	${MKDIR} -p ${OBJECTDIR}

@@ -19,27 +19,51 @@
 #include <map>
 #include <memory>
 #include <vector>
+#include <string>
 
 #include "MyList.h"
 
 #define DEFAULT_CACHE_SIZE 512 // number of elements store in cache not the size in bytes
 
+// Cache interface - type independence
+class IMyCache {
+public:
+	enum POLICY
+	{
+	    CLEAR_ALL = 0,
+	    CLEAR_HALF,
+	    CLEAR_QUATER
+	};
+	
+	virtual ~IMyCache() = default;
+	
+	// core
+//	virtual bool check = 0;
+//	virtual bool get = 0;
+//	virtual void put = 0;
+	
+	//virtual void clear() = 0;
+	
+	// utility
+	//virtual void available() = 0;
+	//virtual void setCapacity(std::uint32_t) = 0;
+	//virtual void setPolicy(POLICY new_policy) = 0;
+    
+	//virtual double hitPercentage() = 0;
+	//virtual const char * name() = 0;
+};
+
 template <typename TKEY, typename TDATA>
-class MyCache
+class MyCache : public IMyCache
 {
 public:
-    enum POLICY
-    {
-        CLEAR_ALL = 0,
-        CLEAR_HALF,
-	CLEAR_QUATER
-    };
 
     // constructors
-    MyCache(std::int32_t size, MyCache::POLICY policy): _capacity(size), _policy(policy), _mutex(){
+    MyCache(std::int32_t size, MyCache::POLICY policy, std::string name): 
+	_capacity(size), _policy(policy), _mutex(), _name(name.c_str()){
 	    initialize();
     }
-    ~MyCache();
+    ~MyCache(){};
 
     // initialize function
     void initialize();
@@ -58,6 +82,7 @@ public:
     inline void setPolicy(POLICY new_policy){ _policy = new_policy;}
     
     inline double hitPercentage() { return _hit * 1.0 / (_hit + _miss); }
+    inline const char * name() { return _name; } 
 
 private:
     // policy for remove element out of cache when reach max capacity
@@ -72,7 +97,7 @@ private:
     // Mapping data structure
     // for O(1) access time
     // map: key=node.key -> value=node's address
-    std::map<TKEY, DoubleNode<TKEY, TDATA>> _mapping;
+    std::map<TKEY, DoubleNode<TKEY, TDATA>*> _mapping;
 
     // addition attributes
     std::uint32_t _capacity;
@@ -82,6 +107,9 @@ private:
     // for statistic only
     std::int32_t _hit;
     std::int32_t _miss;
+    
+    // identifier: all in lower-case. Ex: friend.cache.user,...
+    const char* _name;
     
     void _clear(std::vector<TKEY> candidates);
 };
