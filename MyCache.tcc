@@ -17,6 +17,7 @@
 
 using namespace std;
 
+// ------------ INIT ----------------
 template <typename TKEY, typename TDATA>
 void MyCache<TKEY, TDATA>::initialize(){
 	_current = 0;
@@ -25,6 +26,11 @@ void MyCache<TKEY, TDATA>::initialize(){
 }
 
 // ------------ CORE ----------------
+/**
+ * Function to check whether given key is existed in mapping or not.
+ * @param key: Key Type
+ * @return true if found
+ */
 template <typename TKEY, typename TDATA>
 bool MyCache<TKEY, TDATA>::check(const TKEY& key){
 	return _mapping.find(key) != _mapping.end();
