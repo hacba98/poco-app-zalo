@@ -1,0 +1,19 @@
+<config>
+	<server>
+		<port>8000</port>
+		<log information="./log/inf.txt"/>
+	</server>
+	<database>
+		<workers>4</workers>
+		<user path="./storage/friend.user.kch"/>
+		<counter path="./storage/friend.counter.kch"/>
+		<friend path="./storage/friend.list.kch"/>
+		<pending path="./storage/friend.pending.kch"/>
+		<pendingUser path="./storage/friend.pendingUser.kch"/>
+		<request path="./storage/friend.request.kch"/>
+	</database>
+	<cache>
+		<small_size>50</small_size>
+		<large_size>200</large_size>
+	</cache>
+</config>

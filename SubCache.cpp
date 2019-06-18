@@ -13,6 +13,8 @@
 
 #include "SubCache.h"
 
+using namespace std;
+
 SubCache::SubCache(): _caches(){
 }
 
@@ -34,9 +36,12 @@ void SubCache::initialize(Poco::Util::Application& app){
 		// initialize cache array
 		// large cache - main data: user, friend request
 		MyCache<string, User> *userCache = new MyCache<string, User>(_large_size, _policy, "friend.cache.user");
-		MyCache<string, FriendRequest> *friendCache = new MyCache<string, FriendRequest>(_large_size, _policy, "friend.cache.friendRequest");
+		MyCache<int32_t, FriendRequest> *friendCache = new MyCache<int32_t, FriendRequest>(_large_size, _policy, "friend.cache.friendRequest");
+		MyCache<int32_t, set<int32_t>> *pendingCache = new MyCache<int32_t, set<int32_t>>(_large_size, _policy, "friend.cache.pendingUserId");
+		
 		_caches.push_back(std::unique_ptr<IMyCache>(userCache));
 		_caches.push_back(std::unique_ptr<IMyCache>(friendCache));
+		_caches.push_back(std::unique_ptr<IMyCache>(pendingCache));
 		
 		// small cache? TODO: Should all DB object have a cache object
 		

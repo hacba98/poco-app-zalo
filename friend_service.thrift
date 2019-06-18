@@ -27,7 +27,8 @@ struct FriendRequest {
 	1: i32 p_send_req, // id of person who sending friend request
 	2: i32 p_recv_req, // vice versa
 	3: string greeting,
-	4: i32 time
+	4: i32 time,
+	5: i32 id
 }
 
 ////////////////////////////////////////////////////////
@@ -42,6 +43,7 @@ enum ErrorCode {
 	INVALID_PARAMETER = 2,
 	INVALID_SERVICE = 3,
 	INTERNAL_ERROR = 4,
+	DUPLICATED_REQUEST = 5
 }
 
 // Define data structure for services
@@ -61,7 +63,7 @@ struct GetUserResult {
 
 struct pingResult {
 	1: bool haveData,
-	2: set<i32> pendingData
+	2: list<FriendRequest> data
 }
 
 struct listFriendResult {

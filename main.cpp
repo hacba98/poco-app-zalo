@@ -17,6 +17,7 @@
 #include "Poco/TaskManager.h"
 #include "Poco/Task.h"
 #include "Poco/Exception.h"
+#include "Poco/Path.h"
 
 #include <iostream>
 #include <string>
@@ -34,6 +35,13 @@ class FriendServicesServer : public ServerApplication {
 public:
 
 	FriendServicesServer() : _helpRequested(false) {
+		// register sub system in here -> due to requirement of server 
+		// 1: Request handler
+		addSubsystem(new SubKC());
+		// 2: Database - 
+		addSubsystem(new SubHandler());
+		// 3: Cache
+		addSubsystem(new SubCache());
 	}
 
 	~FriendServicesServer() {
@@ -45,21 +53,6 @@ protected:
 
 		if (_helpRequested) return;
 		cout << "starting Server ..." << endl;
-		loadConfiguration();
-
-		// Set path to data file storage
-		// TODO : load from configurate file
-		configConnection();
-
-		// register sub system in here
-		// Should have 2 subsystems upto now in this project
-		// 1: Request handler
-		// 2: Database - 
-		// 3: Cache
-		addSubsystem(new SubKC());
-		addSubsystem(new SubHandler());
-		addSubsystem(new SubCache());
-
 
 		// initialize application's subsystems
 		try {
@@ -69,7 +62,6 @@ protected:
 		}
 
 		// redirect log into file if running in background
-		//if (!isInteractive())
 		initializeLogging();
 
 	}
@@ -98,8 +90,9 @@ protected:
 			Option("config-file", "f", "load configuration data from a file")
 			.required(false)
 			.repeatable(true)
-			.argument("file"));
-		//.callback(OptionCallback<FriendServicesServer>(this, &FriendServicesServer::handleConfig)));
+			.argument("file")
+			.binding("server.configuration.XML")
+			.callback(OptionCallback<FriendServicesServer>(this, &FriendServicesServer::handleConfig)));
 	}
 
 	void runSystem() {
@@ -145,35 +138,35 @@ protected:
 		helpFormatter.format(std::cout);
 	}
 
-	void handleConfig() {
+	void handleConfig(const std::string& name, const std::string& value) {
 		// pass
+		// load from XML file
+		Poco::Path pXML(config().getString("server.configuration.XML"));
+		if (Application::findFile(pXML)){
+			loadConfiguration(pXML.getFileName(), 0);
+		} else {
+			throw Poco::Exception("Cannot find configuration file.");
+		}
+		
 		return;
 	}
 
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	void configConnection() {
-		config().setString("database.user", string("./storage/friend.user.kch"));
-		config().setString("database.counter", string("./storage/friend.counter.kch"));
-		config().setString("database.friend", string("./storage/friend.list.kch"));
-		config().setString("database.pending", string("./storage/friend.pending.kch"));
-		config().setString("database.request", string("./storage/friend.request.kch"));
-	}
-
 	void initializeLogging() {
-		const std::string path = "./log.txt";
+		const std::string path = config().getString("server.log[@information]");
 		Poco::AutoPtr<Poco::FileChannel> fileChannel(new Poco::FileChannel(path));
 		logger().setChannel(fileChannel);
-
+		return;
+		
 		// logging some basic data
 		// Starting time
-		//		char buffer[30];
-		//		time_t starting = startTime().epochTime();
-		//		strftime(buffer, sizeof(buffer), "%H:%M  %d %h %Y", localtime(&starting));
-		//		logger().information(Logger::format("Starting Server at time: $0", string(buffer)));
-		//		logger().information(Logger::format("Port running: $0", config().getString("server.port")));
+//		char buffer[30];
+//		time_t starting = startTime().epochTime();
+//		strftime(buffer, sizeof(buffer), "%H:%M  %d %h %Y", localtime(&starting));
+//		logger().information(Logger::format("Starting Server at time: $0", string(buffer)));
+//		logger().information(Logger::format("Port running: $0", config().getString("server.port")));
 		//logger().information(Logger::format("PID: $0", string(Poco::Process::id())));
-		return;
 	}
 
 private:

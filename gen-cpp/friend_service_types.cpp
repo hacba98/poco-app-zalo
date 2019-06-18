@@ -18,16 +18,18 @@ int _kErrorCodeValues[] = {
   ErrorCode::USER_NOT_FOUND,
   ErrorCode::INVALID_PARAMETER,
   ErrorCode::INVALID_SERVICE,
-  ErrorCode::INTERNAL_ERROR
+  ErrorCode::INTERNAL_ERROR,
+  ErrorCode::DUPLICATED_REQUEST
 };
 const char* _kErrorCodeNames[] = {
   "SUCCESS",
   "USER_NOT_FOUND",
   "INVALID_PARAMETER",
   "INVALID_SERVICE",
-  "INTERNAL_ERROR"
+  "INTERNAL_ERROR",
+  "DUPLICATED_REQUEST"
 };
-const std::map<int, const char*> _ErrorCode_VALUES_TO_NAMES(::apache::thrift::TEnumIterator(5, _kErrorCodeValues, _kErrorCodeNames), ::apache::thrift::TEnumIterator(-1, NULL, NULL));
+const std::map<int, const char*> _ErrorCode_VALUES_TO_NAMES(::apache::thrift::TEnumIterator(6, _kErrorCodeValues, _kErrorCodeNames), ::apache::thrift::TEnumIterator(-1, NULL, NULL));
 
 
 User::~User() throw() {
@@ -490,6 +492,10 @@ void FriendRequest::__set_time(const int32_t val) {
   this->time = val;
 }
 
+void FriendRequest::__set_id(const int32_t val) {
+  this->id = val;
+}
+
 uint32_t FriendRequest::read(::apache::thrift::protocol::TProtocol* iprot) {
 
   apache::thrift::protocol::TInputRecursionTracker tracker(*iprot);
@@ -543,6 +549,14 @@ uint32_t FriendRequest::read(::apache::thrift::protocol::TProtocol* iprot) {
           xfer += iprot->skip(ftype);
         }
         break;
+      case 5:
+        if (ftype == ::apache::thrift::protocol::T_I32) {
+          xfer += iprot->readI32(this->id);
+          this->__isset.id = true;
+        } else {
+          xfer += iprot->skip(ftype);
+        }
+        break;
       default:
         xfer += iprot->skip(ftype);
         break;
@@ -576,6 +590,10 @@ uint32_t FriendRequest::write(::apache::thrift::protocol::TProtocol* oprot) cons
   xfer += oprot->writeI32(this->time);
   xfer += oprot->writeFieldEnd();
 
+  xfer += oprot->writeFieldBegin("id", ::apache::thrift::protocol::T_I32, 5);
+  xfer += oprot->writeI32(this->id);
+  xfer += oprot->writeFieldEnd();
+
   xfer += oprot->writeFieldStop();
   xfer += oprot->writeStructEnd();
   return xfer;
@@ -587,6 +605,7 @@ void swap(FriendRequest &a, FriendRequest &b) {
   swap(a.p_recv_req, b.p_recv_req);
   swap(a.greeting, b.greeting);
   swap(a.time, b.time);
+  swap(a.id, b.id);
   swap(a.__isset, b.__isset);
 }
 
@@ -595,6 +614,7 @@ FriendRequest::FriendRequest(const FriendRequest& other20) {
   p_recv_req = other20.p_recv_req;
   greeting = other20.greeting;
   time = other20.time;
+  id = other20.id;
   __isset = other20.__isset;
 }
 FriendRequest& FriendRequest::operator=(const FriendRequest& other21) {
@@ -602,6 +622,7 @@ FriendRequest& FriendRequest::operator=(const FriendRequest& other21) {
   p_recv_req = other21.p_recv_req;
   greeting = other21.greeting;
   time = other21.time;
+  id = other21.id;
   __isset = other21.__isset;
   return *this;
 }
@@ -612,6 +633,7 @@ void FriendRequest::printTo(std::ostream& out) const {
   out << ", " << "p_recv_req=" << to_string(p_recv_req);
   out << ", " << "greeting=" << to_string(greeting);
   out << ", " << "time=" << to_string(time);
+  out << ", " << "id=" << to_string(id);
   out << ")";
 }
 
@@ -881,8 +903,8 @@ void pingResult::__set_haveData(const bool val) {
   this->haveData = val;
 }
 
-void pingResult::__set_pendingData(const std::set<int32_t> & val) {
-  this->pendingData = val;
+void pingResult::__set_data(const std::vector<FriendRequest> & val) {
+  this->data = val;
 }
 
 uint32_t pingResult::read(::apache::thrift::protocol::TProtocol* iprot) {
@@ -915,22 +937,21 @@ uint32_t pingResult::read(::apache::thrift::protocol::TProtocol* iprot) {
         }
         break;
       case 2:
-        if (ftype == ::apache::thrift::protocol::T_SET) {
+        if (ftype == ::apache::thrift::protocol::T_LIST) {
           {
-            this->pendingData.clear();
+            this->data.clear();
             uint32_t _size27;
             ::apache::thrift::protocol::TType _etype30;
-            xfer += iprot->readSetBegin(_etype30, _size27);
+            xfer += iprot->readListBegin(_etype30, _size27);
+            this->data.resize(_size27);
             uint32_t _i31;
             for (_i31 = 0; _i31 < _size27; ++_i31)
             {
-              int32_t _elem32;
-              xfer += iprot->readI32(_elem32);
-              this->pendingData.insert(_elem32);
+              xfer += this->data[_i31].read(iprot);
             }
-            xfer += iprot->readSetEnd();
+            xfer += iprot->readListEnd();
           }
-          this->__isset.pendingData = true;
+          this->__isset.data = true;
         } else {
           xfer += iprot->skip(ftype);
         }
@@ -956,15 +977,15 @@ uint32_t pingResult::write(::apache::thrift::protocol::TProtocol* oprot) const {
   xfer += oprot->writeBool(this->haveData);
   xfer += oprot->writeFieldEnd();
 
-  xfer += oprot->writeFieldBegin("pendingData", ::apache::thrift::protocol::T_SET, 2);
+  xfer += oprot->writeFieldBegin("data", ::apache::thrift::protocol::T_LIST, 2);
   {
-    xfer += oprot->writeSetBegin(::apache::thrift::protocol::T_I32, static_cast<uint32_t>(this->pendingData.size()));
-    std::set<int32_t> ::const_iterator _iter33;
-    for (_iter33 = this->pendingData.begin(); _iter33 != this->pendingData.end(); ++_iter33)
+    xfer += oprot->writeListBegin(::apache::thrift::protocol::T_STRUCT, static_cast<uint32_t>(this->data.size()));
+    std::vector<FriendRequest> ::const_iterator _iter32;
+    for (_iter32 = this->data.begin(); _iter32 != this->data.end(); ++_iter32)
     {
-      xfer += oprot->writeI32((*_iter33));
+      xfer += (*_iter32).write(oprot);
     }
-    xfer += oprot->writeSetEnd();
+    xfer += oprot->writeListEnd();
   }
   xfer += oprot->writeFieldEnd();
 
@@ -976,26 +997,26 @@ uint32_t pingResult::write(::apache::thrift::protocol::TProtocol* oprot) const {
 void swap(pingResult &a, pingResult &b) {
   using ::std::swap;
   swap(a.haveData, b.haveData);
-  swap(a.pendingData, b.pendingData);
+  swap(a.data, b.data);
   swap(a.__isset, b.__isset);
 }
 
-pingResult::pingResult(const pingResult& other34) {
-  haveData = other34.haveData;
-  pendingData = other34.pendingData;
-  __isset = other34.__isset;
+pingResult::pingResult(const pingResult& other33) {
+  haveData = other33.haveData;
+  data = other33.data;
+  __isset = other33.__isset;
 }
-pingResult& pingResult::operator=(const pingResult& other35) {
-  haveData = other35.haveData;
-  pendingData = other35.pendingData;
-  __isset = other35.__isset;
+pingResult& pingResult::operator=(const pingResult& other34) {
+  haveData = other34.haveData;
+  data = other34.data;
+  __isset = other34.__isset;
   return *this;
 }
 void pingResult::printTo(std::ostream& out) const {
   using ::apache::thrift::to_string;
   out << "pingResult(";
   out << "haveData=" << to_string(haveData);
-  out << ", " << "pendingData=" << to_string(pendingData);
+  out << ", " << "data=" << to_string(data);
   out << ")";
 }
 
@@ -1057,15 +1078,15 @@ uint32_t listFriendResult::read(::apache::thrift::protocol::TProtocol* iprot) {
         if (ftype == ::apache::thrift::protocol::T_SET) {
           {
             this->friendList.clear();
-            uint32_t _size36;
-            ::apache::thrift::protocol::TType _etype39;
-            xfer += iprot->readSetBegin(_etype39, _size36);
-            uint32_t _i40;
-            for (_i40 = 0; _i40 < _size36; ++_i40)
+            uint32_t _size35;
+            ::apache::thrift::protocol::TType _etype38;
+            xfer += iprot->readSetBegin(_etype38, _size35);
+            uint32_t _i39;
+            for (_i39 = 0; _i39 < _size35; ++_i39)
             {
-              int32_t _elem41;
-              xfer += iprot->readI32(_elem41);
-              this->friendList.insert(_elem41);
+              int32_t _elem40;
+              xfer += iprot->readI32(_elem40);
+              this->friendList.insert(_elem40);
             }
             xfer += iprot->readSetEnd();
           }
@@ -1102,10 +1123,10 @@ uint32_t listFriendResult::write(::apache::thrift::protocol::TProtocol* oprot) c
   xfer += oprot->writeFieldBegin("friendList", ::apache::thrift::protocol::T_SET, 3);
   {
     xfer += oprot->writeSetBegin(::apache::thrift::protocol::T_I32, static_cast<uint32_t>(this->friendList.size()));
-    std::set<int32_t> ::const_iterator _iter42;
-    for (_iter42 = this->friendList.begin(); _iter42 != this->friendList.end(); ++_iter42)
+    std::set<int32_t> ::const_iterator _iter41;
+    for (_iter41 = this->friendList.begin(); _iter41 != this->friendList.end(); ++_iter41)
     {
-      xfer += oprot->writeI32((*_iter42));
+      xfer += oprot->writeI32((*_iter41));
     }
     xfer += oprot->writeSetEnd();
   }
@@ -1124,17 +1145,17 @@ void swap(listFriendResult &a, listFriendResult &b) {
   swap(a.__isset, b.__isset);
 }
 
-listFriendResult::listFriendResult(const listFriendResult& other43) {
+listFriendResult::listFriendResult(const listFriendResult& other42) {
+  size = other42.size;
+  idx = other42.idx;
+  friendList = other42.friendList;
+  __isset = other42.__isset;
+}
+listFriendResult& listFriendResult::operator=(const listFriendResult& other43) {
   size = other43.size;
   idx = other43.idx;
   friendList = other43.friendList;
   __isset = other43.__isset;
-}
-listFriendResult& listFriendResult::operator=(const listFriendResult& other44) {
-  size = other44.size;
-  idx = other44.idx;
-  friendList = other44.friendList;
-  __isset = other44.__isset;
   return *this;
 }
 void listFriendResult::printTo(std::ostream& out) const {

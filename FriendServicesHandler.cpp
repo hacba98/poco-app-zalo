@@ -135,13 +135,25 @@ void FriendServicesHandler::checkRequest(pingResult& _return, const int32_t id){
 			return;
 		}
 		
-		// cache module goes here
-		// TODO change set<i32> to list<Request>
-		
+		for (std::set<int32_t>::iterator it=tmp.begin(); it!=tmp.end(); it++){
+			FriendRequest req;
+			int32_t reqid = *it;
+			// load in cache first
+			if (_cache.get<int32_t, FriendRequest>("friend.cache.friendRequest", reqid, req)){
+				// found in cache
+			} else {
+				// not found
+				string value;
+				_kc.loadRequest(to_string(*it), value);
+				_convert_req.deserialize(value, req);
+			}
+			_return.data.push_back(req);
+			// TODO change set<i32> to list<Request> - DONE
+		}
+					
 		_return.haveData = true;
-		_return.pendingData = tmp;
 	} catch (...) {
-		Application::instance().logger().error("Some thing went wrong");
+		Application::instance().logger().error("Something went wrong");
 	}
 	
 	return;
@@ -157,19 +169,58 @@ ErrorCode::type FriendServicesHandler::addFriend(const FriendRequest& request){
 		return ErrorCode::USER_NOT_FOUND;
 	}
 	
-	// store request in request DB
-	string key_request = _kc.generateRequestId();
-	string value;
-	_convert_req.serialize(request, value);
+	// check request already send
+	{
+		set<int32_t> cachePending;
+		int32_t key = request.p_recv_req;
 	
-	// cache
-	_cache.put<string, FriendRequest>("friend.cache.friendRequest", key_request, request);
+		if (_cache.get<int32_t, set<int32_t>>("friend.cache.pendingUserId", key, cachePending)){
+			// in cache
+			if (cachePending.find(request.p_send_req) != cachePending.end())
+				return ErrorCode::DUPLICATED_REQUEST;
+		} else {
+			// not found in cache
+			_kc.loadPendingUser(p_recv_id, cachePending);
+			if (cachePending.find(request.p_send_req) != cachePending.end())
+				return ErrorCode::DUPLICATED_REQUEST;
+		}
+	}
+	
+	// check user not friend 
+	{
+		std::set<int32_t> tmp;
+		_kc.loadFriendList(p_recv_id, tmp, 0, 0); // get all friend list
+		if (tmp.find(request.p_send_req) != tmp.end())
+			return ErrorCode::DUPLICATED_REQUEST;
+	}
+	
+	// store request in request DB
+	FriendRequest new_request(request);
+	int32_t key_request = _kc.generateRequestId();
+	string skey_request = to_string(key_request);
+	string value;
+	new_request.id = key_request;
+	
+	// get current time
+	Poco::Timestamp now;
+	new_request.time = static_cast<int32_t>(now.epochTime());
+	
+	// serialize object into string
+	_convert_req.serialize(new_request, value);
 	
 	// store in DB
-	_kc.store(key_request, value, SubKC::DB_TYPE::REQUEST);
+	_kc.store(skey_request, value, SubKC::DB_TYPE::REQUEST);
 	
 	// store request key in pending DB
-	_kc.store(p_recv_id, key_request, SubKC::DB_TYPE::PENDING);
+	_kc.store(p_recv_id, skey_request, SubKC::DB_TYPE::PENDING);
+	_kc.store(p_recv_id, p_send_id, SubKC::DB_TYPE::PENDING_USER);
+	
+	// cache 1-request cache. 2-pending cache
+	std::set<int32_t> tmp;
+	_kc.loadPendingUser(p_recv_id, tmp);
+	tmp.insert(request.p_send_req);
+	_cache.put<int32_t, FriendRequest>("friend.cache.friendRequest", key_request, new_request);
+	_cache.put<int32_t, set<int32_t>>("friend.cache.pendingUserId", request.p_recv_req, tmp);
 	
 	return ErrorCode::type::SUCCESS;
 }
@@ -208,6 +259,7 @@ ErrorCode::type FriendServicesHandler::acceptRequest(const int32_t curId, const 
 	
 	// async call
 	_kc.store(uid, reqid, SubKC::DB_TYPE::REMOVE_PENDING);
+	_kc.store(uid, to_string(tmp.p_send_req), SubKC::DB_TYPE::REMOVE_PENDING_USER);
 	_kc.store(uid, to_string(tmp.p_send_req), SubKC::DB_TYPE::FRIEND);
 	
 	return ErrorCode::SUCCESS;

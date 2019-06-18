@@ -69,9 +69,11 @@ template <typename K, typename C> bool SubCache::get(const std::string& name, K&
 	for (int i = 0; i < _caches.size(); i++) {
 		MyCache<K, C> *pC = dynamic_cast<MyCache<K, C>*> (_caches[i].get());
 		if (pC) {
-			if (pC->get(key, ret)) // found in cache
-				return true;
-			return false;
+			if (pC->name() == name.c_str()){
+				if (pC->get(key, ret)) // found in cache
+					return true;
+				return false;
+			}
 		}
 	}
 	Poco::Util::Application::instance().logger().debug("Wrong cache name");
@@ -82,8 +84,10 @@ template <typename K, typename C> void SubCache::put(const std::string& name, co
 	for (int i = 0; i < _caches.size(); i++) {
 		MyCache<K, C> *pC = dynamic_cast<MyCache<K, C>*> (_caches[i].get());
 		if (pC) {
-			pC->put(key, value);
-			return;
+			if (pC->name() == name.c_str()){
+				pC->put(key, value);
+				return;
+			}
 		}
 	}
 	Poco::Util::Application::instance().logger().debug("Wrong cache name");
@@ -94,9 +98,11 @@ template <typename K, typename C> bool SubCache::check(const std::string& name, 
 	for (int i = 0; i < _caches.size(); i++) {
 		MyCache<K, C> *pC = dynamic_cast<MyCache<K, C>*> (_caches[i].get());
 		if(pC){
-			if (pC->check(key)) // found in cache
-				return true;
-			return false;
+			if (pC->name() == name.c_str()){
+				if (pC->check(key)) // found in cache
+					return true;
+				return false;
+			}
 		}
 	}
 	Poco::Util::Application::instance().logger().debug("Wrong cache name");

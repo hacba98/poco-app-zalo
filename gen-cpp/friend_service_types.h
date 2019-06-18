@@ -25,7 +25,8 @@ struct ErrorCode {
     USER_NOT_FOUND = 1,
     INVALID_PARAMETER = 2,
     INVALID_SERVICE = 3,
-    INTERNAL_ERROR = 4
+    INTERNAL_ERROR = 4,
+    DUPLICATED_REQUEST = 5
   };
 };
 
@@ -228,11 +229,12 @@ inline std::ostream& operator<<(std::ostream& out, const PendingRequest& obj)
 }
 
 typedef struct _FriendRequest__isset {
-  _FriendRequest__isset() : p_send_req(false), p_recv_req(false), greeting(false), time(false) {}
+  _FriendRequest__isset() : p_send_req(false), p_recv_req(false), greeting(false), time(false), id(false) {}
   bool p_send_req :1;
   bool p_recv_req :1;
   bool greeting :1;
   bool time :1;
+  bool id :1;
 } _FriendRequest__isset;
 
 class FriendRequest {
@@ -240,7 +242,7 @@ class FriendRequest {
 
   FriendRequest(const FriendRequest&);
   FriendRequest& operator=(const FriendRequest&);
-  FriendRequest() : p_send_req(0), p_recv_req(0), greeting(), time(0) {
+  FriendRequest() : p_send_req(0), p_recv_req(0), greeting(), time(0), id(0) {
   }
 
   virtual ~FriendRequest() throw();
@@ -248,6 +250,7 @@ class FriendRequest {
   int32_t p_recv_req;
   std::string greeting;
   int32_t time;
+  int32_t id;
 
   _FriendRequest__isset __isset;
 
@@ -259,6 +262,8 @@ class FriendRequest {
 
   void __set_time(const int32_t val);
 
+  void __set_id(const int32_t val);
+
   bool operator == (const FriendRequest & rhs) const
   {
     if (!(p_send_req == rhs.p_send_req))
@@ -268,6 +273,8 @@ class FriendRequest {
     if (!(greeting == rhs.greeting))
       return false;
     if (!(time == rhs.time))
+      return false;
+    if (!(id == rhs.id))
       return false;
     return true;
   }
@@ -407,9 +414,9 @@ inline std::ostream& operator<<(std::ostream& out, const GetUserResult& obj)
 }
 
 typedef struct _pingResult__isset {
-  _pingResult__isset() : haveData(false), pendingData(false) {}
+  _pingResult__isset() : haveData(false), data(false) {}
   bool haveData :1;
-  bool pendingData :1;
+  bool data :1;
 } _pingResult__isset;
 
 class pingResult {
@@ -422,19 +429,19 @@ class pingResult {
 
   virtual ~pingResult() throw();
   bool haveData;
-  std::set<int32_t>  pendingData;
+  std::vector<FriendRequest>  data;
 
   _pingResult__isset __isset;
 
   void __set_haveData(const bool val);
 
-  void __set_pendingData(const std::set<int32_t> & val);
+  void __set_data(const std::vector<FriendRequest> & val);
 
   bool operator == (const pingResult & rhs) const
   {
     if (!(haveData == rhs.haveData))
       return false;
-    if (!(pendingData == rhs.pendingData))
+    if (!(data == rhs.data))
       return false;
     return true;
   }

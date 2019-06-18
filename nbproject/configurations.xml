@@ -31,6 +31,7 @@
     <itemPath>SubHandler.h</itemPath>
     <itemPath>SubKC.cpp</itemPath>
     <itemPath>SubKC.h</itemPath>
+    <itemPath>config.xml</itemPath>
     <itemPath>friend_service.thrift</itemPath>
     <itemPath>main.cpp</itemPath>
   </logicalFolder>
@@ -120,6 +121,8 @@
       </item>
       <item path="SubKC.h" ex="false" tool="3" flavor2="0">
       </item>
+      <item path="config.xml" ex="false" tool="3" flavor2="0">
+      </item>
       <item path="friend_service.thrift" ex="false" tool="3" flavor2="0">
       </item>
       <item path="gen-cpp/FriendServices.cpp" ex="false" tool="1" flavor2="0">
@@ -191,6 +194,8 @@
       <item path="SubKC.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="SubKC.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="config.xml" ex="false" tool="3" flavor2="0">
       </item>
       <item path="friend_service.thrift" ex="false" tool="3" flavor2="0">
       </item>

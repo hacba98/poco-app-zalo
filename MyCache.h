@@ -36,7 +36,7 @@ public:
 	};
 	
 	virtual ~IMyCache() = default;
-	IMyCache(const char* name): _name(name){};
+	IMyCache(std::string name): _name(name){};
 	
 	// core
 //	virtual bool check = 0;
@@ -51,14 +51,14 @@ public:
 	//virtual void setPolicy(POLICY new_policy) = 0;
     
 	inline double hitPercentage() { return _hit * 1.0 / (_hit + _miss); }
-	inline const char * name() { return _name; } 
+	inline std::string name() { return _name; } 
 protected:
 	// for statistic only
 	std::int32_t _hit;
 	std::int32_t _miss;
 
 	// identifier: all in lower-case. Ex: friend.cache.user,...
-	const char* _name;
+	std::string _name;
 };
 
 template <typename TKEY, typename TDATA>
@@ -67,7 +67,7 @@ class MyCache : public IMyCache
 public:
 
     // constructors
-    MyCache(std::int32_t size, MyCache::POLICY policy, std::string name): IMyCache(name.c_str()),
+    MyCache(std::int32_t size, MyCache::POLICY policy, std::string name): IMyCache(name),
 	_capacity(size), _policy(policy), _mutex(){
 	    initialize();
     }

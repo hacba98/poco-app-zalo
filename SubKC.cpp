@@ -17,9 +17,9 @@ using namespace std;
 using namespace Poco::Util;
 using namespace kyotocabinet;
 
-SubKC::SubKC(): _queue(), _mQueue(){
-	worker1 = new Worker(this->_queue, this);
-	worker2 = new Worker(this->_queue, this);
+SubKC::SubKC(): _queue(), _mQueue(), _wVec(){
+//	worker1 = new Worker(this->_queue, this);
+//	worker2 = new Worker(this->_queue, this);
 }
 
 SubKC::~SubKC() {
@@ -36,15 +36,23 @@ void SubKC::initialize(Poco::Util::Application& mainApp){
 		// open DB connection
 		// db object for writing data
 		bool valid = false;
-		valid = _dbUser.open(mainApp.config().getString("database.user"), HashDB::OWRITER | HashDB::OCREATE);
-		valid = valid && _dbCounter.open(mainApp.config().getString("database.counter"), HashDB::OWRITER | HashDB::OCREATE);
-		valid = valid && _dbFriend.open(mainApp.config().getString("database.friend"), HashDB::OWRITER | HashDB::OCREATE);
-		valid = valid && _dbPending.open(mainApp.config().getString("database.pending"), HashDB::OWRITER | HashDB::OCREATE);	
-		valid = valid && _dbRequest.open(mainApp.config().getString("database.request"), HashDB::OWRITER | HashDB::OCREATE);
+		valid = _dbUser.open(mainApp.config().getString("database.user[@path]"), HashDB::OWRITER | HashDB::OCREATE);
+		valid = valid && _dbCounter.open(mainApp.config().getString("database.counter[@path]"), HashDB::OWRITER | HashDB::OCREATE);
+		valid = valid && _dbFriend.open(mainApp.config().getString("database.friend[@path]"), HashDB::OWRITER | HashDB::OCREATE);
+		valid = valid && _dbPending.open(mainApp.config().getString("database.pending[@path]"), HashDB::OWRITER | HashDB::OCREATE);	
+		valid = valid && _dbRequest.open(mainApp.config().getString("database.request[@path]"), HashDB::OWRITER | HashDB::OCREATE);
+		valid = valid && _dbPendingUser.open(mainApp.config().getString("database.pendingUser[@path]"), HashDB::OWRITER | HashDB::OCREATE);
 		
 		if (!valid)
 			throw new Poco::Exception("Cannot open connections to database.", Application::EXIT_SOFTWARE);
 
+		// create workers
+		int num_workers = mainApp.config().getInt("database.workers", 4);
+		for (int i=0; i < num_workers; i++){
+			boost::shared_ptr<Poco::Runnable> pNew(new Worker(this->_queue, this));
+			_wVec.push_back(pNew);
+		}
+		
 	} catch (Poco::Exception e) {
 		throw e;
 	}
@@ -54,8 +62,11 @@ void SubKC::initialize(Poco::Util::Application& mainApp){
 
 void SubKC::run(){
 	// TODO : Improve the way to control number of workers depend on demand status.
-	Poco::ThreadPool::defaultPool().start(*worker1);
-	Poco::ThreadPool::defaultPool().start(*worker2);
+//	Poco::ThreadPool::defaultPool().start(*worker1);
+//	Poco::ThreadPool::defaultPool().start(*worker2);
+	for (int i=0; i < _wVec.size(); i++){
+		Poco::ThreadPool::defaultPool().start(*(_wVec[i].get()));
+	}
 	
 	// prepare key
 	string value;
@@ -90,10 +101,10 @@ void SubKC::uninitialize(){
 void SubKC::defineOptions(Poco::Util::OptionSet& options){
 	Subsystem::defineOptions(options);
 	
-	options.addOption(
-		Option("dbhelp", "dbh", "display help about kyoto cabinet database")
-		.required(false)
-		.repeatable(false));
+//	options.addOption(
+//		Option("dbhelp", "dbh", "display help about kyoto cabinet database")
+//		.required(false)
+//		.repeatable(false));
 }
 
 
@@ -126,16 +137,16 @@ int32_t SubKC::generateUserId(){
 	}
 }
 
-string SubKC::generateRequestId(){
+int32_t SubKC::generateRequestId(){
 	Poco::Mutex::ScopedLock lock(_k_req_m);
 	if (_k_req < _kMAX_req) // normal case
-		return to_string(_k_req++);
+		return _k_req++;
 	else { // running out of key to give -> ask for new key range
 		string value;
 		_dbCounter.get("request_counter", value);
 		_kMAX_req = stoi(value) + 9;
 		_dbCounter.set("request_counter", to_string(_kMAX_req + 1));	
-		return to_string(_k_req++);
+		return _k_req++;
 	}
 }
 
@@ -190,6 +201,8 @@ void SubKC::loadPending(const std::string& key, std::set<int32_t>& ret){
 	}
 }
 
+
+
 void SubKC::removePending(const std::string& key, const std::string& value){
 	// remove in pending 
 	int32_t tmp = std::stoi(value);
@@ -211,6 +224,49 @@ void SubKC::removePending(const std::string& key, const std::string& value){
 	}
 }
 
+void SubKC::addPendingUser(const std::string& key, const std::string& value){
+	return _dbPendingUser.append(key, value);
+}
+
+void SubKC::loadPendingUser(const std::string& key, std::set<int32_t>& ret){
+	string value;
+	_dbPendingUser.get(key, value);
+	
+	if (value.size() == 0) return; // don't have any data
+	
+	for(std::string::iterator it = value.begin(); it != value.end(); it+=4){
+		int32_t ivalue = static_cast<int32_t>(
+			static_cast<unsigned char>(it[3]) << 24 |
+			static_cast<unsigned char>(it[2]) << 16 |
+			static_cast<unsigned char>(it[1]) <<  8 |
+			static_cast<unsigned char>(it[0]));
+		ret.insert(ivalue);
+	}
+}
+
+
+
+void SubKC::removePendingUser(const std::string& key, const std::string& value){
+	// remove in pending 
+	int32_t tmp = std::stoi(value);
+	string _value;
+	_dbPendingUser.get(key, _value);
+	
+	for(std::string::iterator it = _value.begin(); it != _value.end(); it+=4){
+		int32_t ivalue = static_cast<int32_t>(
+			static_cast<unsigned char>(it[3]) << 24 |
+			static_cast<unsigned char>(it[2]) << 16 |
+			static_cast<unsigned char>(it[1]) <<  8 |
+			static_cast<unsigned char>(it[0]));
+		
+		if (ivalue == tmp) {
+			_value.erase(it, it+4);
+			_dbPendingUser.set(key, _value);
+			break;
+		}
+	}
+}
+
 bool SubKC::checkRequestExisted(const std::string& key){
 	string value;
 	_dbPending.get(key, value);
@@ -223,6 +279,7 @@ bool SubKC::checkRequestExisted(const std::string& key){
 
 //------------------------- Friend List -------------------------//
 
+// notes: return all result and will be paging in client's side
 void SubKC::loadFriendList(const std::string& key, std::set<int32_t>& ret, int32_t start_index, int32_t range = 10){
 	string value;
 	_dbFriend.get(key, value);
@@ -287,12 +344,20 @@ void Worker::run(){
 						_db->addPending(job->key(), job->value());
 						break;
 						
+					case SubKC::DB_TYPE::PENDING_USER:
+						_db->addPendingUser(job->key(), job->value());
+						break;
+						
 					case SubKC::DB_TYPE::FRIEND:
 						_db->addFriend(job->key(), job->value());
 						break;
 						
 					case SubKC::DB_TYPE::REMOVE_PENDING:
 						_db->removePending(job->key(), job->value());
+						break;
+						
+					case SubKC::DB_TYPE::REMOVE_PENDING_USER:
+						_db->removePendingUser(job->key(), job->value());
 						break;
 				}
 			}

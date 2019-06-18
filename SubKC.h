@@ -35,10 +35,14 @@
 #include <string.h>
 #include <iostream>
 #include <vector>
+#include <boost/smart_ptr/shared_ptr.hpp>
 
 #include "./MyDB.h"
 //#include "./Worker.h"
 
+//typedef Poco::AutoPtr<Poco::Runnable*> WorkerPtr;
+//typedef std::vector<WorkerPtr> WorkerVec;
+//cannot use this method due to lack support some functions from Poco::AutoPtr
 
 class SubKC : public Poco::Util::Subsystem {	
 public:
@@ -47,8 +51,10 @@ enum DB_TYPE {
 	COUNTER,
 	FRIEND,
 	PENDING,
+	PENDING_USER,
 	REQUEST,
 	REMOVE_PENDING,
+	REMOVE_PENDING_USER,
 	SIZE_OF_MVEC,
 };
 	SubKC();
@@ -61,7 +67,7 @@ enum DB_TYPE {
 	
 	// Use to generate auto increment key for DB 
 	int32_t generateUserId();
-	std::string generateRequestId();
+	int32_t generateRequestId();
 	
 	// store - load user data - TODO: Need to change key to char* type for less disk storage
 	bool checkUserExisted(const std::string& key);
@@ -76,6 +82,10 @@ enum DB_TYPE {
 	void addPending (const std::string& key, const std::string& value);
 	void loadPending (const std::string& key, std::set<int32_t>& ret);
 	void removePending (const std::string& key, const std::string& value);
+	void addPendingUser (const std::string& key, const std::string& value);
+	void loadPendingUser (const std::string& key, std::set<int32_t>& ret);
+	void removePendingUser (const std::string& key, const std::string& value);
+	
 	void addFriend (const std::string& key, const std::string& value);
 	void removeFriend (const std::string& key, const std::string& value);
 	void loadFriendList (const std::string& key, std::set<int32_t>& ret, std::int32_t start_index, std::int32_t range); // remember paging
@@ -96,10 +106,8 @@ private:
 	Poco::NotificationQueue _queue;
 	Poco::Mutex _mQueue;
 	
-	// TODO change runnable objects into array of objects
-	Poco::Runnable* worker1;
-	Poco::Runnable* worker2;
-
+	// TODO change runnable objects into array of objects - DONE
+	std::vector<boost::shared_ptr<Poco::Runnable>> _wVec;
 	
 	// db object	
 	MyDB _dbUser;
@@ -107,6 +115,7 @@ private:
 	MyDB _dbFriend;
 	MyDB _dbPending;
 	MyDB _dbRequest;
+	MyDB _dbPendingUser; // similar to pending. contain user's id instead of requests id
 	
 	// current in-mem key generate
 	uint32_t _k_user;

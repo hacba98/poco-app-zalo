@@ -16,12 +16,14 @@
 
 #include "Poco/Util/Application.h"
 #include "Poco/Logger.h"
+#include "Poco/Timestamp.h"
 
 #include "gen-cpp/FriendServices.h"
 #include "SubKC.h"
 #include "SubCache.h"
 #include "Converter.h"
 
+#include <vector>
 #include <thrift/TToString.h>
 
 class FriendServicesHandler : public FriendServicesIf {
