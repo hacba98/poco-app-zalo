@@ -57,8 +57,6 @@ int32_t FriendServicesHandler::CreateUser(const InputProfileData& profile){
 	std::string value;
 	_convert_user.serialize(newUser, value);
 		
-	// cache
-	
 	// store to DB - TODO: Improvement 
 	// should implement notification queue
 	// then only call store and put notifications to the queue
@@ -70,8 +68,7 @@ int32_t FriendServicesHandler::CreateUser(const InputProfileData& profile){
 	_kc.store(id_str, value, SubKC::DB_TYPE::USER);
 	
 	// also store in cache
-	// TODO put into NotificationQueue
-	_cache.put<string, User>("friend.cache.user", id_str, newUser);
+	_cache.putAsync<string, User>("friend.cache.user", id_str, newUser);
 	
 	// log 
 	Application::instance().logger().information(Logger::format("User register successfully. User's id: $0", id_str));

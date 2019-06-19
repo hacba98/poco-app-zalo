@@ -70,3 +70,12 @@ void SubCache::defineOptions(Poco::Util::OptionSet& options){
 		.required(false)
 		.repeatable(false));
 }
+
+
+/// Worker Code
+void CacheWorker::run(){
+	Poco::Notification::Ptr pNf(_queue.waitDequeueNotification());
+	while(pNf){
+		
+	}
+}
