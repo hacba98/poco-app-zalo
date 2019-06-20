@@ -40,6 +40,8 @@ class PendingRequest;
 
 class FriendRequest;
 
+class FriendData;
+
 class InputProfileData;
 
 class GetUserResult;
@@ -298,6 +300,64 @@ inline std::ostream& operator<<(std::ostream& out, const FriendRequest& obj)
   return out;
 }
 
+typedef struct _FriendData__isset {
+  _FriendData__isset() : id(false), name(false), isMale(false) {}
+  bool id :1;
+  bool name :1;
+  bool isMale :1;
+} _FriendData__isset;
+
+class FriendData {
+ public:
+
+  FriendData(const FriendData&);
+  FriendData& operator=(const FriendData&);
+  FriendData() : id(0), name(), isMale(0) {
+  }
+
+  virtual ~FriendData() throw();
+  int32_t id;
+  std::string name;
+  bool isMale;
+
+  _FriendData__isset __isset;
+
+  void __set_id(const int32_t val);
+
+  void __set_name(const std::string& val);
+
+  void __set_isMale(const bool val);
+
+  bool operator == (const FriendData & rhs) const
+  {
+    if (!(id == rhs.id))
+      return false;
+    if (!(name == rhs.name))
+      return false;
+    if (!(isMale == rhs.isMale))
+      return false;
+    return true;
+  }
+  bool operator != (const FriendData &rhs) const {
+    return !(*this == rhs);
+  }
+
+  bool operator < (const FriendData & ) const;
+
+  uint32_t read(::apache::thrift::protocol::TProtocol* iprot);
+  uint32_t write(::apache::thrift::protocol::TProtocol* oprot) const;
+
+  virtual void printTo(std::ostream& out) const;
+};
+
+void swap(FriendData &a, FriendData &b);
+
+inline std::ostream& operator<<(std::ostream& out, const FriendData& obj)
+{
+  obj.printTo(out);
+  return out;
+}
+
 typedef struct _InputProfileData__isset {
   _InputProfileData__isset() : name(false), isMale(false), birthDate(false), phoneNumber(false) {}
   bool name :1;
@@ -466,10 +526,11 @@ inline std::ostream& operator<<(std::ostream& out, const pingResult& obj)
 }
 
 typedef struct _listFriendResult__isset {
-  _listFriendResult__isset() : size(false), idx(false), friendList(false) {}
+  _listFriendResult__isset() : size(false), idx(false), friendList(false), code(false) {}
   bool size :1;
   bool idx :1;
   bool friendList :1;
+  bool code :1;
 } _listFriendResult__isset;
 
 class listFriendResult {
@@ -477,13 +538,14 @@ class listFriendResult {
 
   listFriendResult(const listFriendResult&);
   listFriendResult& operator=(const listFriendResult&);
-  listFriendResult() : size(0), idx(0) {
+  listFriendResult() : size(0), idx(0), code((ErrorCode::type)0) {
   }
 
   virtual ~listFriendResult() throw();
   int32_t size;
   int32_t idx;
-  std::set<int32_t>  friendList;
+  std::vector<FriendData>  friendList;
+  ErrorCode::type code;
 
   _listFriendResult__isset __isset;
 
@@ -491,7 +553,9 @@ class listFriendResult {
 
   void __set_idx(const int32_t val);
 
-  void __set_friendList(const std::set<int32_t> & val);
+  void __set_friendList(const std::vector<FriendData> & val);
+
+  void __set_code(const ErrorCode::type val);
 
   bool operator == (const listFriendResult & rhs) const
   {
@@ -500,6 +564,8 @@ class listFriendResult {
     if (!(idx == rhs.idx))
       return false;
     if (!(friendList == rhs.friendList))
+      return false;
+    if (!(code == rhs.code))
       return false;
     return true;
   }

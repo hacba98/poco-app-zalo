@@ -1,6 +1,6 @@
 <config>
 	<server>
-		<port>8000</port>
+		<port>8080</port>
 		<log information="./log/inf.txt"/>
 	</server>
 	<database>
@@ -14,6 +14,6 @@
 	</database>
 	<cache>
 		<small_size>50</small_size>
-		<large_size>200</large_size>
+		<large_size>20</large_size>
 	</cache>
 </config>

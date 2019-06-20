@@ -14,7 +14,9 @@
 #ifndef MYCACHE_H
 #define MYCACHE_H
 
+#include "Poco/Util/Application.h"
 #include "Poco/Mutex.h"
+#include "Poco/Logger.h"
 
 #include <map>
 #include <memory>

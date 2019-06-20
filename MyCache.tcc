@@ -93,6 +93,7 @@ void MyCache<TKEY, TDATA>::_clear(std::vector<TKEY> candidates){
 
 template <typename TKEY, typename TDATA>
 void MyCache<TKEY, TDATA>::clear(){
+	Poco::Util::Application::instance().logger().information("Clearing Cache");
 	switch (_policy){
 		case POLICY::CLEAR_ALL:
 			//case nay chac ko can

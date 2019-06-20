@@ -102,7 +102,16 @@ protected:
 			database.run();
 			server.start(*this);
 		} catch (Poco::Exception e) {
-			this->logger().error(e.message());
+			logger().error(e.message());
+		}
+	}
+	
+	void stopSystem(){
+		try {
+			SubHandler& server = this->getSubsystem<SubHandler>();
+			server.terminate();
+		} catch (Poco::Exception e) {
+			logger().error(e.message());
 		}
 	}
 
@@ -113,6 +122,7 @@ protected:
 			// Run
 			runSystem();
 			waitForTerminationRequest();
+			stopSystem();
 			uninitialize();
 		}
 		return Application::EXIT_OK;
@@ -154,11 +164,14 @@ protected:
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	void initializeLogging() {
-		const std::string path = config().getString("server.log[@information]");
-		Poco::AutoPtr<Poco::FileChannel> fileChannel(new Poco::FileChannel(path));
-		logger().setChannel(fileChannel);
-		return;
-		
+		try {
+			const std::string path = config().getString("server.log[@information]");
+			Poco::AutoPtr<Poco::FileChannel> fileChannel(new Poco::FileChannel(path));
+			logger().setChannel(fileChannel);
+			return;
+		} catch (Poco::Exception e){
+			logger().error(e.message());
+		}
 		// logging some basic data
 		// Starting time
 //		char buffer[30];

@@ -28,7 +28,7 @@ template <class T>
 class Converter {
 public:
 	Converter(): _m(){
-		boost::shared_ptr<apache::thrift::transport::TMemoryBuffer> buffer(new apache::thrift::transport::TMemoryBuffer(_BUFFER_SIZE_));
+		boost::shared_ptr<apache::thrift::transport::TMemoryBuffer> buffer(new apache::thrift::transport::TMemoryBuffer(_buf, _BUFFER_SIZE_, apache::thrift::transport::TMemoryBuffer::MemoryPolicy::COPY));
 		boost::shared_ptr<apache::thrift::protocol::TProtocol> prot(new apache::thrift::protocol::TBinaryProtocol(buffer));
 
 		_trans = buffer;
@@ -37,22 +37,25 @@ public:
 	~Converter(){};
 	
 	// serialize object o into string
-	inline void serialize(T const& o, std::string& value){
+	void serialize(T const& o, std::string& value){
 		_m.lock();
 		o.write(_prot.get());
 		value = _trans->getBufferAsString();
+		//value = _trans->readAsString(_trans->defaultSize);
 		_trans->resetBuffer(_BUFFER_SIZE_);
+		
 		return _m.unlock();
 	};
 	
 	// de-serialize string and pass it data to object o
-	inline void deserialize(std::string const & value, T& o){
+	void deserialize(std::string const & value, T& o){
 		_m.lock();
-		_trans->resetBuffer((uint8_t*)value.data(), static_cast<uint32_t>(value.length()));
+		_trans->resetBuffer((uint8_t*)value.data(), static_cast<uint32_t>(value.length()), apache::thrift::transport::TMemoryBuffer::MemoryPolicy::COPY);
 		o.read(_prot.get());
 		return _m.unlock();
 	};
 private:
+	uint8_t _buf[_BUFFER_SIZE_];
 	boost::shared_ptr<apache::thrift::transport::TMemoryBuffer> _trans;
 	boost::shared_ptr<apache::thrift::protocol::TProtocol> _prot;
 	Poco::Mutex _m;

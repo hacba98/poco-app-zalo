@@ -269,7 +269,7 @@ void SubKC::removePendingUser(const std::string& key, const std::string& value){
 
 bool SubKC::checkRequestExisted(const std::string& key){
 	string value;
-	_dbPending.get(key, value);
+	_dbRequest.get(key, value);
 	if (value.size() == 0) return false;
 	
 	// should check sender and receiver???
@@ -352,7 +352,7 @@ void Worker::run(){
 						_db->addFriend(job->key(), job->value());
 						break;
 						
-					case SubKC::DB_TYPE::REMOVE_PENDING:
+					case SubKC::DB_TYPE::REMOVE_PENDING_REQUEST:
 						_db->removePending(job->key(), job->value());
 						break;
 						

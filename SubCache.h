@@ -20,14 +20,6 @@
 #include "Poco/Util/Option.h"
 #include "Poco/Logger.h"
 #include "Poco/Exception.h"
-#include "Poco/NotificationQueue.h"
-#include "Poco/Notification.h"
-#include "Poco/NotificationQueue.h"
-#include "Poco/ThreadPool.h"
-#include "Poco/Runnable.h"
-#include "Poco/AutoPtr.h"
-#include "Poco/Mutex.h"
-
 
 #include <vector>
 #include <string>
@@ -52,10 +44,6 @@ public:
 	//
 	template <typename K, typename C>
 	bool check(const std::string& name, const K& key);
-	
-	/// async function support for async call
-	template <typename K, typename C>
-	void putAsync(const std::string& name, const K& key, const C& ret);
 
 protected:
 	virtual void initialize(Poco::Util::Application& app);
@@ -64,15 +52,10 @@ protected:
 	virtual const char* name() const;
 
 private:
-	// caches vector
+	// big cache 
 	std::vector<std::unique_ptr<IMyCache>> _caches;
 
-	// Notification queue
-	Poco::NotificationQueue _queue;
-	Poco::Mutex _mQueue;
-	
-	// TODO change runnable objects into array of objects - DONE
-	std::vector<boost::shared_ptr<Poco::Runnable>> _wVec;
+	// small cache
 
 	// configurations
 	std::uint32_t _small_size;
@@ -125,47 +108,6 @@ template <typename K, typename C> bool SubCache::check(const std::string& name, 
 	Poco::Util::Application::instance().logger().debug("Wrong cache name");
 	return false;
 }
-
-template <typename K, typename C>
-class CacheNotification: public Poco::Notification{
-public:
-	CacheNotification(const std::string& name, const K& key, const C& value):
-		_name(name), _key(key), _value(value){}
-	
-private:
-	std::string _name;
-	K _key;
-	C _value;
-};
-
-class CacheWorker: public Poco::Runnable {
-public:
-	CacheWorker(Poco::NotificationQueue& queue, SubCache* cache): _queue(queue), _cache(cache), _mutex(){
-	};
-	
-	template <typename K, typename C>
-	void run (){
-		Poco::Notification::Ptr pNf(_queue.waitDequeueNotification()); // does not have time out
-		while(pNf){
-			WorkNotification<K, C> *job = dynamic_cast<WorkNotification<K, C>*>(pNf.get());
-			
-		}
-	}
-		
-private:
-	Poco::NotificationQueue& _queue;
-	boost::shared_ptr<SubCache> _cache;
-	Poco::Mutex _mutex;
-};
-
-template <typename K, typename C> void SubCache::putAsync(const std::string& name, const K& key, const C& ret){
-	_mQueue.lock();
-	_queue.enqueueNotification(new CacheNotification<K,C>(name, key, ret));
-	_mQueue.unlock();
-	return;
-}
-
-
 
 #endif /* SUBCACHE_H */
 

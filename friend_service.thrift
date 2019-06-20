@@ -31,6 +31,12 @@ struct FriendRequest {
 	5: i32 id
 }
 
+struct FriendData { // simplify version of User - hinding sensitive data
+	1: i32 id,
+	2: string name,
+	3: bool isMale
+}
+
 ////////////////////////////////////////////////////////
 //		Services exposed by server            //
 ////////////////////////////////////////////////////////
@@ -69,7 +75,8 @@ struct pingResult {
 struct listFriendResult {
 	1: i32 size,
 	2: i32 idx,
-	3: set<i32> friendList
+	3: list<FriendData> friendList,
+	4: ErrorCode code
 }
 
 service FriendServices{
