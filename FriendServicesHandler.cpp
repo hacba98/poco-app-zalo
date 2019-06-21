@@ -71,7 +71,7 @@ int32_t FriendServicesHandler::CreateUser(const InputProfileData& profile){
 	
 	// also store in cache
 	// TODO put into NotificationQueue
-	_cache.put<string, User>("friend.cache.user", id_str, newUser);
+	_cache.put<string, User>("friend.cache.user", id_str, newUser); // TEST
 	
 	// log 
 	Application::instance().logger().information(Logger::format("User register successfully. User's id: $0", id_str));
@@ -88,8 +88,10 @@ void FriendServicesHandler::GetUserInformation(GetUserResult& _return, const int
 	string value;
 	
 	// check in cache
-	if (_cache.get<string, User>("friend.cache.user", id_str, user_)){
+	if (_cache.get<string, User>("friend.cache.user", id_str, user_)){ // TEST
 		// found in cache
+	//if (false){
+
 	} else {
 		// not found in cache
 		// get from DB
@@ -106,7 +108,7 @@ void FriendServicesHandler::GetUserInformation(GetUserResult& _return, const int
 		_convert_user.deserialize(value, user_);
 		
 		// put to cache
-		_cache.put<string, User>("friend.cache.user", id_str, user_);
+		_cache.put<string, User>("friend.cache.user", id_str, user_); // TEST
 	}
 	
 	_return.__isset.data = true;
@@ -232,7 +234,7 @@ ErrorCode::type FriendServicesHandler::acceptRequest(const int32_t curId, const 
 	string uid = to_string(curId);
 	string reqid = to_string(requestId);
 	bool userInCache = _cache.check<string, User>("friend.cache.user", uid);
-	bool requestInCache = _cache.check<string, FriendRequest>("friend.cache.friendRequest", reqid);
+	bool requestInCache = _cache.check<int32_t, FriendRequest>("friend.cache.friendRequest", requestId);
 	
 	// user not found
 	if (!(userInCache || _kc.checkUserExisted(uid)))
@@ -244,9 +246,9 @@ ErrorCode::type FriendServicesHandler::acceptRequest(const int32_t curId, const 
 	// using request id to retrieve sender and receiver
 	string value;
 	FriendRequest tmp;
-	
+	int id = requestId;
 	// cache
-	if (_cache.get<string, FriendRequest>("friend.cache.friendRequest", reqid, tmp)){
+	if (_cache.get<int32_t, FriendRequest>("friend.cache.friendRequest", id, tmp)){
 		// found in cache
 	} else {
 		// not found in cache
@@ -264,7 +266,10 @@ ErrorCode::type FriendServicesHandler::acceptRequest(const int32_t curId, const 
 	// async call
 	_kc.store(uid, reqid, SubKC::DB_TYPE::REMOVE_PENDING_REQUEST);
 	_kc.store(uid, to_string(tmp.p_send_req), SubKC::DB_TYPE::REMOVE_PENDING_USER);
+	
+	// append friend list of both users
 	_kc.store(uid, to_string(tmp.p_send_req), SubKC::DB_TYPE::FRIEND);
+	_kc.store(to_string(tmp.p_send_req), uid, SubKC::DB_TYPE::FRIEND);
 	
 	return ErrorCode::SUCCESS;
 }

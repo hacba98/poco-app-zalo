@@ -87,6 +87,7 @@ template <typename TKEY, typename TDATA>
 void MyCache<TKEY, TDATA>::_clear(std::vector<TKEY> candidates){
 	Poco::Mutex::ScopedLock lock(_mutex);
 	for (int i=0; i < candidates.size(); i++){
+		_mapping[candidates[i]] = NULL;
 		_mapping.erase(candidates[i]);
 	}
 }

@@ -14,6 +14,6 @@
 	</database>
 	<cache>
 		<small_size>50</small_size>
-		<large_size>20</large_size>
+		<large_size>2000</large_size>
 	</cache>
 </config>
