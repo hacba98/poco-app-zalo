@@ -16,8 +16,11 @@
 #include "Poco/FileChannel.h"
 #include "Poco/TaskManager.h"
 #include "Poco/Task.h"
+#include "Poco/TaskNotification.h"
 #include "Poco/Exception.h"
 #include "Poco/Path.h"
+
+#include "Poco/Observer.h"
 
 #include <iostream>
 #include <string>
@@ -30,6 +33,26 @@
 using namespace Poco;
 using namespace Poco::Util;
 using namespace std;
+
+class RunTask : public Poco::Task {
+public:
+
+	RunTask(std::string name) : Poco::Task(name) {
+	}
+
+	void runTask() {
+		setProgress(0);
+		SubHandler &server = Application::instance().getSubsystem<SubHandler>();
+		SubKC &db = Application::instance().getSubsystem<SubKC>();
+		db.run();
+		server.start();
+	}
+
+	void cancel() {
+		SubHandler &server = Application::instance().getSubsystem<SubHandler>();
+		server.terminate();
+	}
+};
 
 class FriendServicesServer : public ServerApplication {
 public:
@@ -46,13 +69,33 @@ public:
 
 	~FriendServicesServer() {
 	}
+	
+	void runSystem() {
+		try {
+			SubKC& database = this->getSubsystem<SubKC>();
+			SubHandler& server = this->getSubsystem<SubHandler>();
+			database.run();
+			server.start();
+		} catch (Poco::Exception e) {
+			logger().error(e.message());
+		}
+	}
+
+	void stopSystem() {
+		try {
+			SubHandler& server = this->getSubsystem<SubHandler>();
+			server.terminate();
+		} catch (Poco::Exception e) {
+			logger().error(e.message());
+		}
+	}
 
 protected:
 
 	void initialize(Application& self) {
 
 		if (_helpRequested) return;
-		cout << "starting Server ..." << endl;
+		cout << "Starting Server ..." << endl;
 
 		// initialize application's subsystems
 		try {
@@ -95,35 +138,23 @@ protected:
 			.callback(OptionCallback<FriendServicesServer>(this, &FriendServicesServer::handleConfig)));
 	}
 
-	void runSystem() {
-		try {
-			SubKC& database = this->getSubsystem<SubKC>();
-			SubHandler& server = this->getSubsystem<SubHandler>();
-			database.run();
-			server.start(*this);
-		} catch (Poco::Exception e) {
-			logger().error(e.message());
-		}
-	}
-	
-	void stopSystem(){
-		try {
-			SubHandler& server = this->getSubsystem<SubHandler>();
-			server.terminate();
-		} catch (Poco::Exception e) {
-			logger().error(e.message());
-		}
-	}
-
 	int main(const std::vector<string>& args) {
 		if (_helpRequested) {
 			displayHelp();
 		} else {
 			// Run
-			runSystem();
+			//			runSystem();
+			//			waitForTerminationRequest();
+			//			stopSystem();
+			//			//uninitialize();
+
+			// Task manager version
+			Poco::ThreadPool pool;
+			Poco::TaskManager tm(pool);
+			tm.start(new RunTask("application"));
 			waitForTerminationRequest();
-			stopSystem();
-			uninitialize();
+			tm.cancelAll();
+			tm.joinAll();
 		}
 		return Application::EXIT_OK;
 	}
@@ -152,12 +183,12 @@ protected:
 		// pass
 		// load from XML file
 		Poco::Path pXML(config().getString("server.configuration.XML"));
-		if (Application::findFile(pXML)){
+		if (Application::findFile(pXML)) {
 			loadConfiguration(pXML.getFileName(), 0);
 		} else {
 			throw Poco::Exception("Cannot find configuration file.");
 		}
-		
+
 		return;
 	}
 
@@ -169,16 +200,16 @@ protected:
 			Poco::AutoPtr<Poco::FileChannel> fileChannel(new Poco::FileChannel(path));
 			logger().setChannel(fileChannel);
 			return;
-		} catch (Poco::Exception e){
+		} catch (Poco::Exception e) {
 			logger().error(e.message());
 		}
 		// logging some basic data
 		// Starting time
-//		char buffer[30];
-//		time_t starting = startTime().epochTime();
-//		strftime(buffer, sizeof(buffer), "%H:%M  %d %h %Y", localtime(&starting));
-//		logger().information(Logger::format("Starting Server at time: $0", string(buffer)));
-//		logger().information(Logger::format("Port running: $0", config().getString("server.port")));
+		//		char buffer[30];
+		//		time_t starting = startTime().epochTime();
+		//		strftime(buffer, sizeof(buffer), "%H:%M  %d %h %Y", localtime(&starting));
+		//		logger().information(Logger::format("Starting Server at time: $0", string(buffer)));
+		//		logger().information(Logger::format("Port running: $0", config().getString("server.port")));
 		//logger().information(Logger::format("PID: $0", string(Poco::Process::id())));
 	}
 

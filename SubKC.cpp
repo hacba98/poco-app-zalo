@@ -87,14 +87,32 @@ void SubKC::run(){
 }
 
 void SubKC::uninitialize(){
-	// Stop workers
-	while (!_queue.empty()) // wait for all incomplete task
-		Poco::Thread::sleep(1000);
-	_queue.wakeUpAll();
-	Poco::ThreadPool::defaultPool().joinAll();
+	Poco::Util::Application::instance().logger().information(Poco::Logger::format("Un-initializing $0 .......", name()));
 	
-	// TODO - db.close
+	try {
+		// Stop workers
+		while (!_queue.empty()) // wait for all incomplete task
+			Poco::Thread::sleep(1000);
+		_queue.wakeUpAll();
+		Poco::ThreadPool::defaultPool().joinAll();
 
+		// db close
+		bool ok = true;
+		ok = _dbUser.close();
+		ok = ok && _dbCounter.close();
+		ok = ok && _dbFriend.close();
+		ok = ok && _dbPending.close();
+		ok = ok && _dbRequest.close();
+		ok = ok && _dbPendingUser.close();
+		
+		if (!ok)
+			throw "Error";
+		
+	} catch (...) {
+		throw Poco::Exception("Something went wrong in un-initializing database process.");
+	}
+	
+	Poco::Util::Application::instance().logger().information(Poco::Logger::format("Un-initializing $0 .....OK \xe2\x99\xaa", name()));
 	return;
 }
 

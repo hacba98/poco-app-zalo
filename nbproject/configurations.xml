@@ -15,7 +15,6 @@
                    kind="IMPORTANT_FILES_FOLDER">
       <itemPath>Makefile</itemPath>
     </logicalFolder>
-    <itemPath>Converter.cpp</itemPath>
     <itemPath>Converter.h</itemPath>
     <itemPath>FriendServicesHandler.cpp</itemPath>
     <itemPath>FriendServicesHandler.h</itemPath>
@@ -89,8 +88,6 @@
           <commandLine>-pthread -lthrift</commandLine>
         </linkerTool>
       </compileType>
-      <item path="Converter.cpp" ex="false" tool="1" flavor2="0">
-      </item>
       <item path="Converter.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="FriendServicesHandler.cpp" ex="false" tool="1" flavor2="0">
@@ -163,8 +160,6 @@
           <developmentMode>5</developmentMode>
         </asmTool>
       </compileType>
-      <item path="Converter.cpp" ex="false" tool="1" flavor2="0">
-      </item>
       <item path="Converter.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="FriendServicesHandler.cpp" ex="false" tool="1" flavor2="0">

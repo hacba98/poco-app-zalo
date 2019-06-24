@@ -19,7 +19,7 @@ using namespace Poco::Util;
 
 using apache::thrift::to_string;
 
-FriendServicesHandler::FriendServicesHandler(): _convert_user() {
+FriendServicesHandler::FriendServicesHandler() : _convert_user() {
 	// get current application instance and it's subsystems
 	// _app = Application::instance();
 	// _kc = Application::instance().getSubsystem<SubKC>();
@@ -34,9 +34,10 @@ FriendServicesHandler::~FriendServicesHandler() {
 }
 
 // Implements basic API
-int32_t FriendServicesHandler::CreateUser(const InputProfileData& profile){
+
+int32_t FriendServicesHandler::CreateUser(const InputProfileData& profile) {
 	Application::instance().logger().information("Incoming register request.");
-	
+
 	// check data
 	if (!profile.__isset.name || !profile.__isset.isMale || !profile.__isset.birthDate || !profile.__isset.phoneNumber)
 		return -1;
@@ -45,20 +46,21 @@ int32_t FriendServicesHandler::CreateUser(const InputProfileData& profile){
 	User newUser;
 	int32_t id = _kc.generateUserId();
 	string id_str = to_string(id);
-	
+
 	newUser.id = id;
 	newUser.isMale = profile.isMale;
 	newUser.birthDate = profile.birthDate;
 	newUser.name = profile.name;
 	newUser.phoneNumber = profile.phoneNumber;
 	newUser.lastActive = 0;
-	
+
 	// serialize
 	std::string value;
-	_convert_user.serialize(newUser, value);
-		
-	// cache
 	
+	_convert_user.serialize(newUser, value);
+	
+	// cache
+
 	// store to DB - TODO: Improvement 
 	// should implement notification queue
 	// then only call store and put notifications to the queue
@@ -68,29 +70,29 @@ int32_t FriendServicesHandler::CreateUser(const InputProfileData& profile){
 	//_kc.storeUser(id_str, value);
 	// new version - implemented notification queue
 	_kc.store(id_str, value, SubKC::DB_TYPE::USER);
-	
+
 	// also store in cache
 	// TODO put into NotificationQueue
 	_cache.put<string, User>("friend.cache.user", id_str, newUser); // TEST
-	
+
 	// log 
 	Application::instance().logger().information(Logger::format("User register successfully. User's id: $0", id_str));
-	
+
 	return id;
 }
 
-void FriendServicesHandler::GetUserInformation(GetUserResult& _return, const int32_t id){
+void FriendServicesHandler::GetUserInformation(GetUserResult& _return, const int32_t id) {
 	Application::instance().logger().information("Incoming get data request.");
-	
+
 	// initialize
 	User user_;
 	string id_str = to_string(id);
 	string value;
-	
+
 	// check in cache
-	if (_cache.get<string, User>("friend.cache.user", id_str, user_)){ // TEST
+	if (_cache.get<string, User>("friend.cache.user", id_str, user_)) { // TEST
 		// found in cache
-	//if (false){
+		//if (false){
 
 	} else {
 		// not found in cache
@@ -98,50 +100,50 @@ void FriendServicesHandler::GetUserInformation(GetUserResult& _return, const int
 		_kc.loadUser(id_str, value);
 
 		// check if user existed or not
-		if(value.length() == 0){
+		if (value.length() == 0) {
 			_return.__isset.data = false;
 			_return.code = ErrorCode::USER_NOT_FOUND;
 			return;
 		}
-		
+
 		// convert from string to object
 		_convert_user.deserialize(value, user_);
-		
+
 		// put to cache
 		_cache.put<string, User>("friend.cache.user", id_str, user_); // TEST
 	}
-	
+
 	_return.__isset.data = true;
 	_return.data = user_;
 	_return.code = ErrorCode::SUCCESS;
 }
 
-void FriendServicesHandler::checkRequest(pingResult& _return, const int32_t id){
+void FriendServicesHandler::checkRequest(pingResult& _return, const int32_t id) {
 	Application::instance().logger().information("Checking friend pending request.");
-	
+
 	// check user existed
 	string uid = to_string(id);
-	if (!_kc.checkUserExisted(uid)){
+	if (!_kc.checkUserExisted(uid)) {
 		_return.haveData = false;
 		return;
 	}
-	
+
 	// get
 	try {
 		std::set<int32_t> tmp;
 		_kc.loadPending(uid, tmp);
-		
+
 		// case that don't have any data
 		if (tmp.empty()) {
 			_return.haveData = false;
 			return;
 		}
-		
-		for (std::set<int32_t>::iterator it=tmp.begin(); it!=tmp.end(); it++){
+
+		for (std::set<int32_t>::iterator it = tmp.begin(); it != tmp.end(); it++) {
 			FriendRequest req;
 			int32_t reqid = *it;
 			// load in cache first
-			if (_cache.get<int32_t, FriendRequest>("friend.cache.friendRequest", reqid, req)){
+			if (_cache.get<int32_t, FriendRequest>("friend.cache.friendRequest", reqid, req)) {
 				// found in cache
 			} else {
 				// not found
@@ -152,31 +154,31 @@ void FriendServicesHandler::checkRequest(pingResult& _return, const int32_t id){
 			_return.data.push_back(req);
 			// TODO change set<i32> to list<Request> - DONE
 		}
-					
+
 		_return.haveData = true;
 	} catch (...) {
 		Application::instance().logger().error("Something went wrong");
 	}
-	
+
 	return;
 }
 
-ErrorCode::type FriendServicesHandler::addFriend(const FriendRequest& request){
+ErrorCode::type FriendServicesHandler::addFriend(const FriendRequest& request) {
 	Application::instance().logger().information("Incoming add friend request");
-	
+
 	// check user existed
 	string p_send_id = to_string(request.p_send_req);
 	string p_recv_id = to_string(request.p_recv_req);
-	if (!_kc.checkUserExisted(p_send_id) || !_kc.checkUserExisted(p_recv_id)){
+	if (!_kc.checkUserExisted(p_send_id) || !_kc.checkUserExisted(p_recv_id)) {
 		return ErrorCode::USER_NOT_FOUND;
 	}
-	
+
 	// check request already send
 	{
 		set<int32_t> cachePending;
 		int32_t key = request.p_recv_req;
-	
-		if (_cache.get<int32_t, set<int32_t>>("friend.cache.pendingUserId", key, cachePending)){
+
+		if (_cache.get<int32_t, set < int32_t >> ("friend.cache.pendingUserId", key, cachePending)) {
 			// in cache
 			if (cachePending.find(request.p_send_req) != cachePending.end())
 				return ErrorCode::DUPLICATED_REQUEST;
@@ -187,7 +189,7 @@ ErrorCode::type FriendServicesHandler::addFriend(const FriendRequest& request){
 				return ErrorCode::DUPLICATED_REQUEST;
 		}
 	}
-	
+
 	// check user not friend 
 	{
 		std::set<int32_t> tmp;
@@ -195,140 +197,141 @@ ErrorCode::type FriendServicesHandler::addFriend(const FriendRequest& request){
 		if (tmp.find(request.p_send_req) != tmp.end())
 			return ErrorCode::DUPLICATED_REQUEST;
 	}
-	
+
 	// store request in request DB
 	FriendRequest new_request(request);
 	int32_t key_request = _kc.generateRequestId();
 	string skey_request = to_string(key_request);
 	string value;
 	new_request.id = key_request;
-	
+
 	// get current time
 	Poco::Timestamp now;
-	new_request.time = static_cast<int32_t>(now.epochTime());
-	
+	new_request.time = static_cast<int32_t> (now.epochTime());
+
 	// serialize object into string
 	_convert_req.serialize(new_request, value);
-	
+
 	// store in DB
 	_kc.store(skey_request, value, SubKC::DB_TYPE::REQUEST);
-	
+
 	// store request key in pending DB
 	_kc.store(p_recv_id, skey_request, SubKC::DB_TYPE::PENDING);
 	_kc.store(p_recv_id, p_send_id, SubKC::DB_TYPE::PENDING_USER);
-	
+
 	// cache 1-request cache. 2-pending cache
 	std::set<int32_t> tmp;
 	_kc.loadPendingUser(p_recv_id, tmp);
 	tmp.insert(request.p_send_req);
 	_cache.put<int32_t, FriendRequest>("friend.cache.friendRequest", key_request, new_request);
-	_cache.put<int32_t, set<int32_t>>("friend.cache.pendingUserId", request.p_recv_req, tmp);
-	
+	_cache.put<int32_t, set < int32_t >> ("friend.cache.pendingUserId", request.p_recv_req, tmp);
+
 	return ErrorCode::type::SUCCESS;
 }
 
-ErrorCode::type FriendServicesHandler::acceptRequest(const int32_t curId, const int32_t requestId){
+ErrorCode::type FriendServicesHandler::acceptRequest(const int32_t curId, const int32_t requestId) {
 	Application::instance().logger().information("Add friend request");
-	
+
 	// check user existed
 	string uid = to_string(curId);
 	string reqid = to_string(requestId);
 	bool userInCache = _cache.check<string, User>("friend.cache.user", uid);
 	bool requestInCache = _cache.check<int32_t, FriendRequest>("friend.cache.friendRequest", requestId);
-	
+
 	// user not found
 	if (!(userInCache || _kc.checkUserExisted(uid)))
 		return ErrorCode::USER_NOT_FOUND;
 	// request not found
 	if (!(requestInCache || _kc.checkRequestExisted(reqid)))
 		return ErrorCode::INVALID_PARAMETER;
-	
+
 	// using request id to retrieve sender and receiver
 	string value;
 	FriendRequest tmp;
 	int id = requestId;
 	// cache
-	if (_cache.get<int32_t, FriendRequest>("friend.cache.friendRequest", id, tmp)){
+	if (_cache.get<int32_t, FriendRequest>("friend.cache.friendRequest", id, tmp)) {
 		// found in cache
 	} else {
 		// not found in cache
 		// db
 		_kc.loadRequest(reqid, value);
-		
+
 		if (value.size() == 0) return ErrorCode::INVALID_PARAMETER;
-	
+
 		// convert from string to instance
 		_convert_req.deserialize(value, tmp);
 	}
-	
+
 	if (to_string(tmp.p_recv_req) != uid) return ErrorCode::INVALID_PARAMETER;
-	
+
 	// async call
 	_kc.store(uid, reqid, SubKC::DB_TYPE::REMOVE_PENDING_REQUEST);
 	_kc.store(uid, to_string(tmp.p_send_req), SubKC::DB_TYPE::REMOVE_PENDING_USER);
-	
+
 	// append friend list of both users
 	_kc.store(uid, to_string(tmp.p_send_req), SubKC::DB_TYPE::FRIEND);
 	_kc.store(to_string(tmp.p_send_req), uid, SubKC::DB_TYPE::FRIEND);
-	
+
 	return ErrorCode::SUCCESS;
 }
 
 // copy from above code except code that store to Friend List DB
-ErrorCode::type FriendServicesHandler::declineRequest(const int32_t curId, const int32_t requestId){ 
+
+ErrorCode::type FriendServicesHandler::declineRequest(const int32_t curId, const int32_t requestId) {
 	Application::instance().logger().information("Add friend request");
-	
+
 	// check user existed
 	string uid = to_string(curId);
 	string reqid = to_string(requestId);
 	bool userInCache = _cache.check<string, User>("friend.cache.user", uid);
 	bool requestInCache = _cache.check<string, FriendRequest>("friend.cache.friendRequest", reqid);
-	
+
 	// user not found
 	if (!(userInCache || _kc.checkUserExisted(uid)))
 		return ErrorCode::USER_NOT_FOUND;
 	// request not found
 	if (!(requestInCache || _kc.checkRequestExisted(reqid)))
 		return ErrorCode::INVALID_PARAMETER;
-	
+
 	// using request id to retrieve sender and receiver
 	string value;
 	FriendRequest tmp;
-	
+
 	// cache
-	if (_cache.get<string, FriendRequest>("friend.cache.friendRequest", reqid, tmp)){
+	if (_cache.get<string, FriendRequest>("friend.cache.friendRequest", reqid, tmp)) {
 		// found in cache
 	} else {
 		// not found in cache
 		// db
 		_kc.loadRequest(reqid, value);
-		
+
 		if (value.size() == 0) return ErrorCode::INVALID_PARAMETER;
-	
+
 		// convert from string to instance
 		_convert_req.deserialize(value, tmp);
 	}
-	
+
 	if (to_string(tmp.p_recv_req) != uid) return ErrorCode::INVALID_PARAMETER;
-	
+
 	// async call
 	_kc.store(uid, reqid, SubKC::DB_TYPE::REMOVE_PENDING_REQUEST);
 	_kc.store(uid, to_string(tmp.p_send_req), SubKC::DB_TYPE::REMOVE_PENDING_USER);
-	
+
 	return ErrorCode::SUCCESS;
 }
 
-ErrorCode::type FriendServicesHandler::removeFriend(const int32_t curId, const int32_t friendId){
+ErrorCode::type FriendServicesHandler::removeFriend(const int32_t curId, const int32_t friendId) {
 	return ErrorCode::SUCCESS;
 }
 
-void FriendServicesHandler::viewFriendList(listFriendResult& _return, const int32_t id, const int32_t index, const int32_t size){
+void FriendServicesHandler::viewFriendList(listFriendResult& _return, const int32_t id, const int32_t index, const int32_t size) {
 	Application::instance().logger().information("Incoming view friend list request");
-	
+
 	try {
 		// check user existed
 		string uid = to_string(id);
-		if (!_kc.checkUserExisted(uid)){
+		if (!_kc.checkUserExisted(uid)) {
 			return;
 		}
 
@@ -337,22 +340,22 @@ void FriendServicesHandler::viewFriendList(listFriendResult& _return, const int3
 		_kc.loadFriendList(uid, tmp, index, size);
 
 		// filter out of range starting index
-		if (index >= tmp.size() || index < 0){
+		if (index >= tmp.size() || index < 0) {
 			_return.code = ErrorCode::INVALID_PARAMETER;
 			return;
 		}
-		
+
 		std::set<int32_t>::iterator it = tmp.begin();
-		for(int i=0; i<index; i++)
+		for (int i = 0; i < index; i++)
 			it++;
 
 		int limit_ = (index + size) >= tmp.size() ? tmp.size() : index + size; // filter out of range request
-		for (int i=index; i < limit_; i++){
+		for (int i = index; i < limit_; i++) {
 			User detailData;
 			FriendData simplifyData;
 			int32_t id = *(it++);
 			string id_str = to_string(id);
-			if (_cache.get<string, User>("friend.cache.user", id_str, detailData)){
+			if (_cache.get<string, User>("friend.cache.user", id_str, detailData)) {
 				// found in cache
 			} else {
 				// not found
@@ -373,6 +376,6 @@ void FriendServicesHandler::viewFriendList(listFriendResult& _return, const int3
 		Application::instance().logger().error("Get friend list fail");
 		_return.code = ErrorCode::INTERNAL_ERROR;
 	}
-	
+
 	return;
 }

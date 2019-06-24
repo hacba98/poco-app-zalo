@@ -24,6 +24,7 @@
 #include <thrift/server/TSimpleServer.h>
 #include <thrift/transport/TServerSocket.h>
 #include <thrift/transport/TSocket.h>
+#include <thrift/TToString.h>
 
 #include "FriendServicesHandler.h"
 
@@ -52,8 +53,9 @@ public:
 	// method for using 
 	void run();
 	void terminate();
-	void start(Poco::Util::Application& app);
-		
+	void start();
+	
+	
 	
 private:
 	int _port;

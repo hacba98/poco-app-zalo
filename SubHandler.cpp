@@ -59,10 +59,10 @@ void SubHandler::initialize(Poco::Util::Application& app){
 }
 
 void SubHandler::uninitialize() {
+	Poco::Util::Application::instance().logger().information(Logger::format("Un-initializing $0 .......", name()));
 	if (_running)
 		terminate();
-	// do whaT?
-	//~SubHandler();
+	Poco::Util::Application::instance().logger().information(Logger::format("Un-initializing $0 .....OK \xe2\x99\xaa", name()));
 }
 
 void SubHandler::defineOptions(Poco::Util::OptionSet& options){
@@ -79,22 +79,24 @@ void SubHandler::run(){
 		throw Poco::Exception("Server is already start", Application::EXIT_NOHOST);
 	}
 	_running = true;
-	_core->serve();
+	return _core->run();
 }
 
 void SubHandler::terminate(){
-	if(_running)
+	if(_running){
 		_core->stop();
-		
+	}
+	
 	_running = false;
 }
 
-void SubHandler::start(Poco::Util::Application& app){
+using apache::thrift::to_string;
+void SubHandler::start(){
 	try{
-		app.logger().information(Logger::format("Server is starting at port $0", app.config().getString("server.port", "8080")));
+		Poco::Util::Application::instance().logger().information(Logger::format("Server is starting at port $0", to_string(_port)));
 		this->run();
 	} catch (Poco::Exception e){
-		app.logger().error(e.message());
+		Poco::Util::Application::instance().logger().error(e.message());
 	}
 }
 

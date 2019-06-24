@@ -30,6 +30,7 @@
 #include "Poco/AutoPtr.h"
 #include "Poco/Mutex.h"
 
+
 #include <thrift/TToString.h>
 
 #include <string.h>

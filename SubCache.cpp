@@ -14,6 +14,7 @@
 #include "SubCache.h"
 
 using namespace std;
+using namespace Poco;
 
 SubCache::SubCache(): _caches(){
 }
@@ -53,13 +54,15 @@ void SubCache::initialize(Poco::Util::Application& app){
 }
 
 void SubCache::uninitialize(){
-	// what to do here?
-	// cache auto delete when obj delete
+	// cache automatically remove memory in destructor
+	Poco::Util::Application::instance().logger().information(Logger::format("Un-initializing $0 .......", name()));
+	
 	// print out hit rate
 	for (int i=0; i < _caches.size(); i++){
 		Poco::Util::Application::instance().logger().information(
 			Poco::Logger::format("Hit rate of $0 = $1.", _caches[i]->name(), to_string(_caches[i]->hitPercentage())));
 	}
+	Poco::Util::Application::instance().logger().information(Logger::format("Un-initializing $0 .....OK \xe2\x99\xaa", name()));	
 }
 
 void SubCache::defineOptions(Poco::Util::OptionSet& options){

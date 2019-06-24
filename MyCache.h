@@ -73,7 +73,9 @@ public:
 	_capacity(size), _policy(policy), _mutex(){
 	    initialize();
     }
-    ~MyCache(){};
+    ~MyCache(){
+	    _mapping.clear();
+    }
 
     // initialize function
     void initialize();
