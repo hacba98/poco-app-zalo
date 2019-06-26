@@ -298,7 +298,7 @@ bool SubKC::checkRequestExisted(const std::string& key){
 //------------------------- Friend List -------------------------//
 
 // notes: return all result and will be paging in client's side
-void SubKC::loadFriendList(const std::string& key, std::set<int32_t>& ret, int32_t start_index, int32_t range = 10){
+void SubKC::loadFriendList(const std::string& key, std::set<int32_t>& ret){
 	string value;
 	_dbFriend.get(key, value);
 	

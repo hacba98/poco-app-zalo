@@ -26,7 +26,8 @@ struct ErrorCode {
     INVALID_PARAMETER = 2,
     INVALID_SERVICE = 3,
     INTERNAL_ERROR = 4,
-    DUPLICATED_REQUEST = 5
+    DUPLICATED_REQUEST = 5,
+    OUT_OF_RANGE = 6
   };
 };
 

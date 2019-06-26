@@ -89,7 +89,7 @@ enum DB_TYPE {
 	
 	void addFriend (const std::string& key, const std::string& value);
 	void removeFriend (const std::string& key, const std::string& value);
-	void loadFriendList (const std::string& key, std::set<int32_t>& ret, std::int32_t start_index, std::int32_t range); // remember paging
+	void loadFriendList (const std::string& key, std::set<int32_t>& ret); // remember paging
 	bool checkRequestExisted (const std::string& key);
 	
 	void acceptFriend(const std::string& key, const std::string& request_id);

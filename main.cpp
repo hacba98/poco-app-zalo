@@ -131,7 +131,7 @@ protected:
 
 		options.addOption(
 			Option("config-file", "f", "load configuration data from a file")
-			.required(false)
+			.required(true)
 			.repeatable(true)
 			.argument("file")
 			.binding("server.configuration.XML")

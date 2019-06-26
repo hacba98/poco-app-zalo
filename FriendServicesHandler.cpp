@@ -193,7 +193,7 @@ ErrorCode::type FriendServicesHandler::addFriend(const FriendRequest& request) {
 	// check user not friend 
 	{
 		std::set<int32_t> tmp;
-		_kc.loadFriendList(p_recv_id, tmp, 0, 0); // get all friend list
+		_kc.loadFriendList(p_recv_id, tmp); // get all friend list
 		if (tmp.find(request.p_send_req) != tmp.end())
 			return ErrorCode::DUPLICATED_REQUEST;
 	}
@@ -332,16 +332,17 @@ void FriendServicesHandler::viewFriendList(listFriendResult& _return, const int3
 		// check user existed
 		string uid = to_string(id);
 		if (!_kc.checkUserExisted(uid)) {
+			_return.code = ErrorCode::USER_NOT_FOUND;
 			return;
 		}
 
 		// get data
 		std::set<int32_t> tmp;
-		_kc.loadFriendList(uid, tmp, index, size);
+		_kc.loadFriendList(uid, tmp);
 
 		// filter out of range starting index
 		if (index >= tmp.size() || index < 0) {
-			_return.code = ErrorCode::INVALID_PARAMETER;
+			_return.code = ErrorCode::OUT_OF_RANGE;
 			return;
 		}
 
@@ -349,7 +350,16 @@ void FriendServicesHandler::viewFriendList(listFriendResult& _return, const int3
 		for (int i = 0; i < index; i++)
 			it++;
 
-		int limit_ = (index + size) >= tmp.size() ? tmp.size() : index + size; // filter out of range request
+		// filter out of range data 
+		int limit_ = -1;
+		if (index + size >= tmp.size()){ // out of range or read all
+			limit_ = tmp.size();
+			_return.idx = -1; // no more data to load
+		} else {
+			limit_ = index + size;
+			_return.idx = limit_;
+		}
+		
 		for (int i = index; i < limit_; i++) {
 			User detailData;
 			FriendData simplifyData;
@@ -369,8 +379,10 @@ void FriendServicesHandler::viewFriendList(listFriendResult& _return, const int3
 			_return.friendList.push_back(simplifyData);
 		}
 
-		_return.idx = index;
-		_return.size = limit_;
+		// because we can get size of result from result itself so we should
+		// return something more useful for later processing
+		// size of all data
+		_return.size = tmp.size();
 		_return.code = ErrorCode::SUCCESS;
 	} catch (...) {
 		Application::instance().logger().error("Get friend list fail");

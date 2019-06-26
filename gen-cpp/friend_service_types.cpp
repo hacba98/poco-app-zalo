@@ -19,7 +19,8 @@ int _kErrorCodeValues[] = {
   ErrorCode::INVALID_PARAMETER,
   ErrorCode::INVALID_SERVICE,
   ErrorCode::INTERNAL_ERROR,
-  ErrorCode::DUPLICATED_REQUEST
+  ErrorCode::DUPLICATED_REQUEST,
+  ErrorCode::OUT_OF_RANGE
 };
 const char* _kErrorCodeNames[] = {
   "SUCCESS",
@@ -27,9 +28,10 @@ const char* _kErrorCodeNames[] = {
   "INVALID_PARAMETER",
   "INVALID_SERVICE",
   "INTERNAL_ERROR",
-  "DUPLICATED_REQUEST"
+  "DUPLICATED_REQUEST",
+  "OUT_OF_RANGE"
 };
-const std::map<int, const char*> _ErrorCode_VALUES_TO_NAMES(::apache::thrift::TEnumIterator(6, _kErrorCodeValues, _kErrorCodeNames), ::apache::thrift::TEnumIterator(-1, NULL, NULL));
+const std::map<int, const char*> _ErrorCode_VALUES_TO_NAMES(::apache::thrift::TEnumIterator(7, _kErrorCodeValues, _kErrorCodeNames), ::apache::thrift::TEnumIterator(-1, NULL, NULL));
 
 
 User::~User() throw() {

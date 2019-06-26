@@ -49,7 +49,8 @@ enum ErrorCode {
 	INVALID_PARAMETER = 2,
 	INVALID_SERVICE = 3,
 	INTERNAL_ERROR = 4,
-	DUPLICATED_REQUEST = 5
+	DUPLICATED_REQUEST = 5,
+	OUT_OF_RANGE = 6
 }
 
 // Define data structure for services
@@ -73,7 +74,9 @@ struct pingResult {
 }
 
 struct listFriendResult {
+	// size of result
 	1: i32 size,
+	// idx of next item in list, -1 if it is last page
 	2: i32 idx,
 	3: list<FriendData> friendList,
 	4: ErrorCode code

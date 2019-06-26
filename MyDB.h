@@ -48,6 +48,7 @@ public:
 	void increase(const std::string& key);
 	bool existed(const std::string& key);
 	void append(const std::string& key, const std::string& value);
+	void loadPartial(const std::string& key, std::string& value, const int index, const int range);
 	
 private:
 	kyotocabinet::HashDB _kcdb;

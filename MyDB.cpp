@@ -59,3 +59,19 @@ void MyDB::append(const std::string& key, const std::string& value){
 	MyDB::bytes ivalue = {std::stoi(value)};
 	bool ok = _kcdb.append(key.c_str(), key.size(), ivalue.c_arr, 4); // size = 4 bytes
 }
+
+// status: incomplete, handle in Handler
+void MyDB::loadPartial(const std::string& key, std::string& value, const int index, const int range){
+	// database storing new data using append
+	// retrieve data need to be in reverse order -> newest first
+	// must have to load all value in DB but we can ease the networking load
+	// by reduce the size of result
+	if(_kcdb.get(key, &value)){ // found key
+		
+	} else
+		value = "";
+	return;
+}	
+
+
+
